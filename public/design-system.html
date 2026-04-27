@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reshma — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  /* Layout */
+  .page { max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; }
+
+  .header { margin-bottom: 4rem; }
+  .header h1 { font-family: 'Instrument Serif', serif; font-size: 48px; color: #fff; font-weight: 400; }
+  .header p { font-size: 14px; color: #5a5a6a; margin-top: 8px; }
+  .header .badge { display: inline-block; background: rgba(107,53,184,0.2); border: 1px solid rgba(107,53,184,0.4); color: #a078e8; font-size: 11px; padding: 4px 12px; border-radius: 999px; margin-top: 12px; }
+
+  .section { margin-bottom: 4rem; }
+  .section-title {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: #5a5a6a; margin-bottom: 1.5rem;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4rem 0; }
+
+  /* Colors */
+  .color-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+  .swatch-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; }
+  .swatch-name { font-size: 11px; color: #5a5a6a; text-align: center; line-height: 1.4; }
+  .swatch-hex { font-size: 10px; color: #3a3a4a; text-align: center; font-family: monospace; }
+  .new-badge { font-size: 9px; background: #6B35B8; color: white; padding: 2px 8px; border-radius: 4px; }
+
+  /* Typography */
+  .type-hero-preview {
+    font-family: 'Instrument Serif', serif;
+    font-size: 52px; color: #000; line-height: 0.95;
+    letter-spacing: -2.46px; background: #F7F6F2;
+    padding: 2rem; border-radius: 16px; margin-bottom: 1.5rem;
+  }
+  .type-hero-preview .gray { color: #6F6F6F; font-style: italic; }
+
+  .type-row { display: flex; gap: 32px; flex-wrap: wrap; align-items: baseline; margin-bottom: 1.5rem; }
+  .type-sample { }
+  .type-label { font-size: 11px; color: #5a5a6a; margin-top: 4px; }
+
+  .type-scale { display: flex; flex-direction: column; gap: 12px; }
+  .type-scale-row { display: flex; align-items: baseline; gap: 16px; }
+  .type-scale-size { font-size: 11px; color: #3a3a4a; width: 40px; font-family: monospace; }
+
+  /* Buttons */
+  .btn-grid { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+  .btn-item { display: flex; flex-direction: column; gap: 8px; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center;
+    background: #12122a; border: 1px solid rgba(100,100,180,0.5);
+    border-radius: 14px; font-family: 'Inter', sans-serif;
+    cursor: pointer; overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-primary:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(107,53,184,0.4); }
+  .btn-primary .btn-text { padding: 14px 20px; font-size: 15px; color: white; }
+  .btn-primary .btn-arrow {
+    background: linear-gradient(135deg, #6B35B8, #0F3D3E);
+    padding: 12px 14px; margin: 4px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: white;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover .btn-arrow { opacity: 0.85; }
+
+  .btn-text-only {
+    display: inline-flex; align-items: center;
+    background: #12122a; border: 1px solid rgba(100,100,180,0.5);
+    border-radius: 14px; font-family: 'Inter', sans-serif;
+    padding: 14px 28px; font-size: 15px; color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-text-only:hover { transform: scale(1.03); background: #1a1a3a; box-shadow: 0 0 20px rgba(107,53,184,0.3); }
+
+  .btn-accent1 {
+    display: inline-flex; align-items: center;
+    background: #6B35B8; border: none; border-radius: 10px;
+    padding: 12px 24px; font-size: 15px; color: white;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .btn-accent1:hover { transform: scale(1.03); background: #7d42d4; }
+
+  .btn-accent2 {
+    display: inline-flex; align-items: center;
+    background: #0F3D3E; border: none; border-radius: 10px;
+    padding: 12px 24px; font-size: 15px; color: white;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .btn-accent2:hover { transform: scale(1.03); background: #185455; }
+
+  .btn-nav-active {
+    display: inline-flex; align-items: center;
+    border: 1.5px solid #111; border-radius: 12px;
+    padding: 8px 20px; font-size: 14px;
+    font-family: 'Inter', sans-serif; background: transparent; color: #111; cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .btn-nav-active:hover { background: #111; color: white; }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center;
+    border: 1px solid rgba(255,255,255,0.2); border-radius: 999px;
+    padding: 10px 24px; font-size: 14px;
+    font-family: 'Inter', sans-serif; background: transparent; color: #a0a0b0; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.5); color: white; background: rgba(255,255,255,0.05); }
+
+  /* Navbar */
+  .navbar {
+    background: #F7F6F2; border-radius: 16px;
+    padding: 16px 28px; display: flex;
+    align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
+  .navbar-logo { font-family: 'Instrument Serif', serif; font-size: 22px; color: #000; }
+  .navbar-links { display: flex; gap: 24px; align-items: center; }
+  .nav-link { font-size: 14px; color: #6F6F6F; font-family: 'Inter', sans-serif; text-decoration: none; }
+  .nav-link.active { border: 1.5px solid #111; border-radius: 12px; padding: 6px 16px; color: #111; }
+
+  /* Glass cards */
+  .glass-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .glass {
+    background: rgba(255,255,255,0.06); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 24px;
+    padding: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .glass-title { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 8px; }
+  .glass-body { font-size: 13px; color: #a0a0b0; line-height: 1.6; }
+  .glass-stat { font-size: 13px; color: #e0e0e0; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); line-height: 1.5; }
+  .glass-stat:last-child { border-bottom: none; }
+
+  /* Radius */
+  .radius-grid { display: flex; gap: 20px; align-items: flex-end; }
+  .radius-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .radius-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); }
+
+  /* Spacing */
+  .spacing-grid { display: flex; flex-direction: column; gap: 8px; }
+  .spacing-row { display: flex; align-items: center; gap: 12px; }
+  .spacing-bar { background: rgba(107,53,184,0.4); height: 8px; border-radius: 2px; }
+  .spacing-label { font-size: 12px; color: #5a5a6a; font-family: monospace; min-width: 80px; }
+
+  /* Animations */
+  .anim-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+  .anim-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 1rem 1.25rem; min-width: 180px;
+  }
+  .anim-name { font-size: 13px; color: #fff; margin-bottom: 4px; font-weight: 500; }
+  .anim-spec { font-size: 11px; color: #5a5a6a; line-height: 1.6; font-family: monospace; }
+
+  /* Footer */
+  .footer { margin-top: 6rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.06); }
+  .footer-text { font-size: 12px; color: #3a3a4a; }
+  .footer-hint {
+    margin-top: 1rem; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;
+    padding: 1rem; font-size: 12px; color: #5a5a6a; font-family: monospace;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Reshma</h1>
+    <p>Portfolio Design System — Living Reference</p>
+    <span class="badge">v3.0 · April 2026</span>
+  </div>
+
+  <!-- Colors -->
+  <div class="section">
+    <div class="section-title">Colors</div>
+    <div class="color-grid">
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#F7F6F2;border:1px solid #ddd;"></div>
+        <div class="swatch-name">Background</div>
+        <div class="swatch-hex">#F7F6F2</div>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#0a0a0f;border:1px solid #222;"></div>
+        <div class="swatch-name">Dark BG</div>
+        <div class="swatch-hex">#0a0a0f</div>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);"></div>
+        <div class="swatch-name">Glass Surface</div>
+        <div class="swatch-hex">rgba white 6%</div>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#ffffff;border:1px solid #eee;"></div>
+        <div class="swatch-name">Primary</div>
+        <div class="swatch-hex">#ffffff</div>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#a0a0b0;"></div>
+        <div class="swatch-name">Secondary</div>
+        <div class="swatch-hex">#a0a0b0</div>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#6F6F6F;"></div>
+        <div class="swatch-name">Muted</div>
+        <div class="swatch-hex">#6F6F6F</div>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#6B35B8;"></div>
+        <div class="swatch-name">Accent 1</div>
+        <div class="swatch-hex">#6B35B8</div>
+        <span class="new-badge">NEW</span>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#0F3D3E;"></div>
+        <div class="swatch-name">Accent 2</div>
+        <div class="swatch-hex">#0F3D3E</div>
+        <span class="new-badge">NEW</span>
+      </div>
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:#12122a;border:1px solid rgba(100,100,180,0.4);"></div>
+        <div class="swatch-name">CTA BG</div>
+        <div class="swatch-hex">#12122a</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Typography -->
+  <div class="section">
+    <div class="section-title">Typography</div>
+    <div class="type-hero-preview">
+      Designing for <span class="gray">people,</span> in an <span class="gray">AI-first</span> world.
+    </div>
+    <div class="type-row">
+      <div class="type-sample">
+        <div style="font-family:'Instrument Serif',serif;font-size:32px;color:#fff;font-weight:400;">Instrument Serif</div>
+        <div class="type-label">Display · Headlines · Logo</div>
+      </div>
+      <div class="type-sample">
+        <div style="font-family:'Inter',sans-serif;font-size:20px;color:#a0a0b0;">Inter Regular</div>
+        <div class="type-label">Body · Navigation · UI</div>
+      </div>
+    </div>
+    <div class="type-scale">
+      <div class="type-scale-row"><span class="type-scale-size">12px</span><span style="font-size:12px;color:#5a5a6a;">Labels, captions</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">14px</span><span style="font-size:14px;color:#a0a0b0;">Navigation items</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">16px</span><span style="font-size:16px;color:#c0c0c0;">Body text</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">18px</span><span style="font-size:18px;color:#d0d0d0;">Subtitles, descriptions</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">24px</span><span style="font-size:24px;color:#e0e0e0;">Section headers</span></div>
+      <div class="type-scale-row"><span class="type-scale-size">Hero</span><span style="font-family:'Instrument Serif',serif;font-size:36px;color:#fff;line-height:1;">Headline</span></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Buttons -->
+  <div class="section">
+    <div class="section-title">Buttons — hover to see states</div>
+    <div class="btn-grid">
+      <div class="btn-item">
+        <div class="btn-primary">
+          <span class="btn-text">Explore my journey</span>
+          <span class="btn-arrow">→</span>
+        </div>
+        <div class="type-label">Primary + arrow</div>
+      </div>
+      <div class="btn-item">
+        <div class="btn-text-only">Explore my journey</div>
+        <div class="type-label">Primary text only</div>
+      </div>
+      <div class="btn-item">
+        <button class="btn-accent1">Sign up</button>
+        <div class="type-label">Accent 1 — purple</div>
+      </div>
+      <div class="btn-item">
+        <button class="btn-accent2">Get started</button>
+        <div class="type-label">Accent 2 — teal</div>
+      </div>
+      <div class="btn-item">
+        <button class="btn-nav-active">Home</button>
+        <div class="type-label">Nav active state</div>
+      </div>
+      <div class="btn-item">
+        <button class="btn-ghost">See my work</button>
+        <div class="type-label">Ghost / secondary</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Navbar -->
+  <div class="section">
+    <div class="section-title">Navbar</div>
+    <div class="navbar">
+      <div class="navbar-logo">Reshma</div>
+      <div class="navbar-links">
+        <a class="nav-link active" href="#">Home</a>
+        <a class="nav-link" href="#">Work</a>
+        <a class="nav-link" href="#">Resume</a>
+        <a class="nav-link" href="#">LinkedIn</a>
+        <a class="nav-link" href="#">AI Playground</a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Glass Cards -->
+  <div class="section">
+    <div class="section-title">Glassmorphic Cards</div>
+    <div class="glass-grid">
+      <div class="glass">
+        <div class="glass-title">Career Highlights</div>
+        <div class="glass-stat">12-step workflow → 1 unified system for 500K+ users</div>
+        <div class="glass-stat">30% fewer errors across 2,000+ banking accounts</div>
+        <div class="glass-stat">0 → 1 AI product shipped in 10 weeks</div>
+      </div>
+      <div class="glass">
+        <div class="glass-title">Skills</div>
+        <div class="glass-body">Everything a designer needs—anything else, I'll pick it up.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Border Radius -->
+  <div class="section">
+    <div class="section-title">Border Radius</div>
+    <div class="radius-grid">
+      <div class="radius-item">
+        <div class="radius-box" style="width:48px;height:48px;border-radius:8px;"></div>
+        <div class="type-label">8px · sm</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="width:48px;height:48px;border-radius:12px;"></div>
+        <div class="type-label">12px · md</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="width:48px;height:48px;border-radius:16px;"></div>
+        <div class="type-label">16px · navbar</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="width:48px;height:48px;border-radius:24px;"></div>
+        <div class="type-label">24px · lg</div>
+      </div>
+      <div class="radius-item">
+        <div class="radius-box" style="width:64px;height:36px;border-radius:999px;"></div>
+        <div class="type-label">999px · pill</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Spacing -->
+  <div class="section">
+    <div class="section-title">Spacing</div>
+    <div class="spacing-grid">
+      <div class="spacing-row"><span class="spacing-label">--space-xs · 4px</span><div class="spacing-bar" style="width:4px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">--space-sm · 8px</span><div class="spacing-bar" style="width:8px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">--space-md · 16px</span><div class="spacing-bar" style="width:16px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">--space-lg · 24px</span><div class="spacing-bar" style="width:24px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">--space-xl · 40px</span><div class="spacing-bar" style="width:40px;"></div></div>
+      <div class="spacing-row"><span class="spacing-label">--space-2xl · 64px</span><div class="spacing-bar" style="width:64px;"></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Animations -->
+  <div class="section">
+    <div class="section-title">Animations</div>
+    <div class="anim-grid">
+      <div class="anim-card">
+        <div class="anim-name">fade-rise</div>
+        <div class="anim-spec">opacity 0→1<br>translateY 20→0px<br>0.8s ease-out</div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-name">fade-rise-delay</div>
+        <div class="anim-spec">same as above<br>delay: 0.2s</div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-name">fade-rise-delay-2</div>
+        <div class="anim-spec">same as above<br>delay: 0.4s</div>
+      </div>
+      <div class="anim-card">
+        <div class="anim-name">Ken Burns (bg)</div>
+        <div class="anim-spec">scale 100→108%<br>slight upward drift<br>infinite loop</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-text">Reshma's Portfolio Design System · Built April 2026</div>
+    <div class="footer-hint">To use in Cursor: @DESIGN-SYSTEM.md — follow all tokens, components, and rules defined here.</div>
+  </div>
+
+</div>
+</body>
+</html>
