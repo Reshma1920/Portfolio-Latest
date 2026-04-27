@@ -6,10 +6,14 @@ const BUBBLE_ASSISTANT = 'border border-white/25 bg-[rgba(92,92,92,0.08)]'
 const bentoCardClass =
   'min-h-0 flex flex-col rounded-[24px] border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.03)] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.12)] backdrop-blur-[8px]'
 
+/** Glassmorphic accent: design-system purple #6B35B8 → teal #0F3D3E (matches CTA / send button) */
+const glassAccentIconBadge =
+  'bg-gradient-to-br from-[#6B35B8]/40 via-[#3d3566]/28 to-[#0F3D3E]/44 backdrop-blur-md border border-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_2px_12px_rgba(15,61,62,0.2)] text-[#14141c]'
+
 function IconTrophy() {
   return (
     <svg
-      className="h-4 w-4 shrink-0 text-[var(--tw-ring-offset-color)]"
+      className="h-4 w-4 shrink-0 text-[#14141c]"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -26,7 +30,7 @@ function IconTrophy() {
 function IconTools() {
   return (
     <svg
-      className="h-4 w-4 shrink-0 text-black"
+      className="h-4 w-4 shrink-0 text-[#14141c]"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -41,18 +45,21 @@ function IconTools() {
 function UserAvatar() {
   return (
     <div
-      className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/35 bg-[rgba(77,122,122,1)]"
+      className={`flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full ${glassAccentIconBadge}`}
       aria-hidden
     >
       <svg
-        className="h-4 w-4 text-black"
+        className="h-4 w-4 text-[#14141c]"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
       >
         <circle cx="12" cy="8" r="3.5" />
-        <path d="M4 20.5c0-3.3 2.5-5.5 8-5.5s8 2.2 8 5.5" strokeLinecap="round" />
+        <path
+          d="M4 20.5c0-3.3 2.5-5.5 8-5.5s8 2.2 8 5.5"
+          strokeLinecap="round"
+        />
       </svg>
     </div>
   )
@@ -78,11 +85,7 @@ const highlights: string[] = [
 ]
 
 function BentoOuter({ children }: { children: ReactNode }) {
-  return (
-    <div className="-mt-16 min-h-0 rounded-[24px] border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.06)] p-[34px] shadow-[0_8px_32px_rgba(0,0,0,0.15)] backdrop-blur-[10px]">
-      {children}
-    </div>
-  )
+  return <div className="-mt-16 min-h-0">{children}</div>
 }
 
 export function BentoGrid() {
@@ -101,7 +104,7 @@ export function BentoGrid() {
               <div className="shrink-0">
                 <div className="ml-auto flex w-full items-end justify-end gap-2">
                   <p
-                    className={`w-fit max-w-[min(100%,20rem)] rounded-2xl rounded-br-md px-2.5 py-1.5 text-left text-sm leading-snug [text-wrap:pretty] text-black [box-shadow:inset_0_1px_0_rgba(255,255,255,0.12)] ${BUBBLE_USER}`}
+                    className={`w-fit max-w-[min(100%,20rem)] rounded-2xl rounded-br-md px-2.5 py-1.5 text-left text-base leading-snug [text-wrap:pretty] text-black [box-shadow:inset_0_1px_0_rgba(255,255,255,0.12)] ${BUBBLE_USER}`}
                   >
                     Reshma, tell me about yourself!
                   </p>
@@ -109,27 +112,32 @@ export function BentoGrid() {
                 </div>
               </div>
               <div className="mt-8 shrink-0">
-                <div className="mr-auto flex w-full max-w-full gap-1.5 sm:max-w-md">
-                  <img
-                    src="/avatar-reshma.png"
-                    alt="Reshma"
-                    className="h-7 w-7 shrink-0 rounded-full border border-white/30 object-cover object-top [box-shadow:inset_0_1px_0_rgba(255,255,255,0.15)]"
-                    width={28}
-                    height={28}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div
-                    className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-sm leading-snug [text-wrap:pretty] text-black ${BUBBLE_ASSISTANT} [box-shadow:inset_0_1px_0_rgba(255,255,255,0.1)]`}
-                  >
-                    Generalist designer looking for unique product challenges. I bring
-                    structure to ambiguous problems and help shape products as they take
-                    form.
+                <div className="mr-auto flex w-full max-w-full flex-col gap-1 sm:max-w-md">
+                  <p className="pl-[2.125rem] font-sans text-xs text-black/55">
+                    Reshma Lokanathan
+                  </p>
+                  <div className="flex gap-1.5">
+                    <img
+                      src="/avatar-reshma.png"
+                      alt="Reshma"
+                      className="h-7 w-7 shrink-0 rounded-full border border-white/30 object-cover object-top [box-shadow:inset_0_1px_0_rgba(255,255,255,0.15)]"
+                      width={28}
+                      height={28}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div
+                      className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-base leading-snug [text-wrap:pretty] text-black ${BUBBLE_ASSISTANT} [box-shadow:inset_0_1px_0_rgba(255,255,255,0.1)]`}
+                    >
+                      Generalist designer looking for unique product challenges. I bring
+                      structure to ambiguous problems and help shape products as they take
+                      form.
+                    </div>
                   </div>
                 </div>
               </div>
               <div
-                className={`mt-20 flex min-h-0 shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.08)] ${BUBBLE_ASSISTANT} border border-white/20`}
+                className={`mt-[60px] flex min-h-0 shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.08)] ${BUBBLE_ASSISTANT} border border-white/20`}
               >
                 <input
                   type="text"
@@ -140,7 +148,7 @@ export function BentoGrid() {
                 />
                 <button
                   type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/25 bg-white/15 text-black transition hover:bg-white/20"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#6B35B8] to-[#0F3D3E] text-white transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   aria-label="Send"
                 >
                   <IconSendPlane />
@@ -156,7 +164,7 @@ export function BentoGrid() {
             >
               <div className="mb-1.5 flex min-h-0 items-center gap-1.5">
                 <span
-                  className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[rgba(77,122,122,1)] p-1.5"
+                  className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 ${glassAccentIconBadge}`}
                   aria-hidden
                 >
                   <IconTrophy />
@@ -165,7 +173,7 @@ export function BentoGrid() {
                   Career Highlights
                 </h2>
               </div>
-              <ul className="flex min-h-0 flex-1 flex-col justify-center gap-3.5 text-xs sm:gap-4 sm:text-sm">
+              <ul className="flex min-h-0 flex-1 flex-col justify-center gap-3.5 text-sm sm:gap-4 sm:text-base">
                 {highlights.map((line) => (
                   <li
                     key={line}
@@ -180,7 +188,7 @@ export function BentoGrid() {
             <div className={`${bentoCardClass} shrink-0`}>
               <div className="mb-1.5 flex items-center gap-1.5">
                 <span
-                  className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[rgba(15,61,62,0.2)] p-1.5"
+                  className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 ${glassAccentIconBadge}`}
                   aria-hidden
                 >
                   <IconTools />
@@ -189,8 +197,8 @@ export function BentoGrid() {
                   Skills
                 </h2>
               </div>
-              <p className="m-0 text-xs leading-relaxed text-black sm:text-sm [text-wrap:pretty]">
-                Everything a designer needs—anything else, I&apos;ll pick it up.
+              <p className="m-0 text-sm leading-relaxed text-black sm:text-base [text-wrap:pretty]">
+                Everything a designer needs! Anything else, I&apos;ll pick it up.
               </p>
             </div>
           </div>
