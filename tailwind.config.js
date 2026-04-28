@@ -11,6 +11,7 @@ export default {
       fontFamily: {
         display: ['"Instrument Serif"', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        dmSans: ['"DM Sans"', 'system-ui', 'sans-serif'],
       },
     },
   },

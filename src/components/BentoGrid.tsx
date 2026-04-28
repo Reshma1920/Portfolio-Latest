@@ -129,9 +129,9 @@ export function BentoGrid() {
                     <div
                       className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-base leading-snug [text-wrap:pretty] text-black ${BUBBLE_ASSISTANT} [box-shadow:inset_0_1px_0_rgba(255,255,255,0.1)]`}
                     >
-                      Generalist designer looking for unique product challenges. I bring
-                      structure to ambiguous problems and help shape products as they take
-                      form.
+                      Generalist Product Designer looking for unique product challenges. I
+                      bring structure to ambiguous problems and help shape products as they
+                      take form.
                     </div>
                   </div>
                 </div>
@@ -143,8 +143,8 @@ export function BentoGrid() {
                   type="text"
                   readOnly
                   className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#333333] placeholder:text-[#333333] focus:outline-none focus:ring-0"
-                  placeholder="Ask me anything..."
-                  aria-label="Chat input (preview)"
+                  placeholder="Take me through your work..."
+                  aria-label="Take me through your work (preview)"
                 />
                 <button
                   type="button"
