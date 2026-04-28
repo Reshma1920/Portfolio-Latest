@@ -137,12 +137,17 @@ export function WorkSection() {
     <section id="work" className="w-full bg-[#F7F6F2] font-dmSans">
       {/* Outer padding matches CinematicHero nav wrapper (px-3 sm:px-5); inner width matches nav bar (max-w-7xl). */}
       <div className="px-3 sm:px-5">
-        <div className="mx-auto w-full max-w-7xl py-[80px]">
-          <h2 className="text-center font-dmSans text-[40px] font-medium text-[#000000]">
-            Explore my work
-          </h2>
+        <div className="mx-auto w-full max-w-7xl pb-[80px] pt-[80px]">
+          <div className="mb-[80px] flex justify-center">
+            <div className="relative border border-solid border-[#e0e0e0] bg-white px-[64px] py-[16px]">
+              <CornerBrackets />
+              <h2 className="font-display text-center text-[40px] font-medium text-[#000000]">
+                Explore my work
+              </h2>
+            </div>
+          </div>
 
-          <div className="mt-14 flex flex-col gap-[62px]">
+          <div className="flex flex-col gap-[62px]">
             <ProjectCard
               companyName="SuperLabs Inc."
               logoSrc="/superlabs-logo.png"

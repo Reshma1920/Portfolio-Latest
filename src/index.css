@@ -7,7 +7,15 @@
 
 @layer base {
   html {
-    @apply antialiased;
+    /* Room for fixed hero nav when scrolling to #home / #work */
+    scroll-padding-top: calc(16px + 76px);
+    @apply scroll-smooth antialiased;
+  }
+
+  @media (min-width: 640px) {
+    html {
+      scroll-padding-top: calc(20px + 76px);
+    }
   }
 
   body {

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { scrollToSectionId } from '../utils/scroll'
 
 const BUBBLE_USER = 'border border-white/25 bg-[rgba(92,92,92,0.1)]'
 const BUBBLE_ASSISTANT = 'border border-white/25 bg-[rgba(92,92,92,0.08)]'
@@ -84,6 +85,10 @@ const highlights: string[] = [
   '0 → 1 AI product shipped in 10 weeks',
 ]
 
+function scrollToWorkSection() {
+  scrollToSectionId('work')
+}
+
 function BentoOuter({ children }: { children: ReactNode }) {
   return <div className="-mt-16 min-h-0">{children}</div>
 }
@@ -150,6 +155,7 @@ export function BentoGrid() {
                   type="button"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#6B35B8] to-[#0F3D3E] text-white transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                   aria-label="Send"
+                  onClick={scrollToWorkSection}
                 >
                   <IconSendPlane />
                 </button>
