@@ -46,6 +46,9 @@ function SectionPill({
 const bodyClass = 'font-dmSans text-[16px] leading-[1.7] text-[#333]'
 const sectionTitleClass = 'font-dmSans text-[32px] font-semibold text-black'
 
+const HERO_VIDEO_TRIM_START_SEC = 7
+const HERO_VIDEO_TRIM_END_SEC = 32
+
 /** cross_pattern.png (symlink → crosspattern.png), tiled at 40% opacity, base #f0eeea — `dark`: grid + white corner brackets */
 function ImagePlaceholder({
   width,
@@ -55,6 +58,7 @@ function ImagePlaceholder({
   hideCornerMarkers = false,
   noBorder = false,
   variant = 'default',
+  videoSrc,
 }: {
   width: number | string
   height: number | string
@@ -63,8 +67,34 @@ function ImagePlaceholder({
   hideCornerMarkers?: boolean
   noBorder?: boolean
   variant?: 'default' | 'dark'
+  videoSrc?: string
 }) {
   const isDark = variant === 'dark'
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (!videoSrc || isDark) return
+    const el = videoRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry) return
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          void el.play().catch(() => {})
+        } else {
+          el.pause()
+          el.currentTime = HERO_VIDEO_TRIM_START_SEC
+        }
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 1] },
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [videoSrc, isDark])
+
   const h = typeof height === 'number' ? `${height}px` : height
   const w = typeof width === 'number' ? `${width}px` : width
   const borderClass =
@@ -85,6 +115,27 @@ function ImagePlaceholder({
       ) : (
         <div className="absolute inset-0 bg-[url('/cross_pattern.png')] bg-repeat opacity-40" aria-hidden />
       )}
+      {!isDark && videoSrc ? (
+        <div className="absolute inset-0 z-[1] flex items-center justify-center p-6">
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            className="h-auto max-h-full w-[85%] object-contain [box-shadow:0_8px_32px_rgba(0,0,0,0.15)]"
+            muted
+            playsInline
+            aria-hidden
+            onLoadedMetadata={(e) => {
+              e.currentTarget.currentTime = HERO_VIDEO_TRIM_START_SEC
+            }}
+            onTimeUpdate={(e) => {
+              const v = e.currentTarget
+              if (v.currentTime >= HERO_VIDEO_TRIM_END_SEC) {
+                v.currentTime = HERO_VIDEO_TRIM_START_SEC
+              }
+            }}
+          />
+        </div>
+      ) : null}
       {!hideCornerMarkers ? isDark ? <CornerMarkersLight /> : <CornerMarkers /> : null}
       {label ? (
         <span
@@ -776,10 +827,15 @@ export default function HDFCCaseStudy() {
                 HDFC Bank · Lead Product Designer
               </p>
               <h1 className="mt-6 max-w-xl font-dmSans text-[48px] font-semibold leading-[1.1] text-black">
-                Loan Management Tool to Eliminate Agent Dependency
+                Enterprise Loan Management Platform for India&apos;s Largest Private Bank
               </h1>
             </div>
-            <ImagePlaceholder width={600} height={400} className="w-full lg:mt-14" />
+            <ImagePlaceholder
+              width={600}
+              height={400}
+              className="w-full lg:mt-14"
+              videoSrc="/HDFC%20Video%20.mp4"
+            />
           </div>
         </section>
 
