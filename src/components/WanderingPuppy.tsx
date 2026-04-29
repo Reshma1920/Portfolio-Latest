@@ -72,7 +72,7 @@ function SpeechBubble({ children }: { children: string }) {
     >
       <span className="block max-w-[min(92vw,420px)] whitespace-nowrap">{children}</span>
       <span
-        className="absolute left-[56px] top-full border-x-[6px] border-t-[7px] border-x-transparent border-t-[#1a1a1a]"
+        className="absolute left-[24px] top-full border-x-[6px] border-t-[7px] border-x-transparent border-t-[#1a1a1a]"
         aria-hidden
       />
     </div>
@@ -91,6 +91,17 @@ export function WanderingPuppy() {
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastHoverPhraseRef = useRef<string | null>(null)
   const greetingTimerIdsRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const greetingTextRef = useRef<string | null>(null)
+  const clickStepRef = useRef<number | null>(null)
+  const hoverRotationOrderRef = useRef<string[] | null>(null)
+  const rotationIndexRef = useRef(0)
+  const idleBubbleDismissRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastIdleCorgiRef = useRef<number | null>(null)
+
+  const [idleRotationText, setIdleRotationText] = useState<string | null>(null)
+  const [idleRotationCorgiIndex, setIdleRotationCorgiIndex] = useState<number | null>(
+    null,
+  )
 
   const clearGreetingTimers = useCallback(() => {
     greetingTimerIdsRef.current.forEach(clearTimeout)
@@ -125,6 +136,68 @@ export function WanderingPuppy() {
     const choice = pool[Math.floor(Math.random() * pool.length)]!
     lastHoverPhraseRef.current = choice
     return choice
+  }, [])
+
+  useEffect(() => {
+    greetingTextRef.current = greetingText
+  }, [greetingText])
+
+  useEffect(() => {
+    clickStepRef.current = clickStep
+  }, [clickStep])
+
+  useEffect(() => {
+    const phrases = [...HOVER_PHRASES]
+    for (let i = phrases.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const t = phrases[i]!
+      phrases[i] = phrases[j]!
+      phrases[j] = t
+    }
+    hoverRotationOrderRef.current = phrases
+
+    const tick = () => {
+      if (hoverRef.current) return
+      if (greetingTextRef.current) return
+      if (clickStepRef.current !== null) return
+
+      const order = hoverRotationOrderRef.current
+      if (!order?.length) return
+
+      const idx = rotationIndexRef.current % order.length
+      rotationIndexRef.current++
+      const phrase = order[idx]!
+
+      const prevCorgi = lastIdleCorgiRef.current
+      let corgiIdx = Math.floor(Math.random() * CORGI_SRC.length)
+      if (prevCorgi !== null) {
+        while (corgiIdx === prevCorgi) {
+          corgiIdx = Math.floor(Math.random() * CORGI_SRC.length)
+        }
+      }
+      lastIdleCorgiRef.current = corgiIdx
+
+      if (idleBubbleDismissRef.current) {
+        clearTimeout(idleBubbleDismissRef.current)
+        idleBubbleDismissRef.current = null
+      }
+      setIdleRotationCorgiIndex(corgiIdx)
+      setIdleRotationText(phrase)
+      idleBubbleDismissRef.current = window.setTimeout(() => {
+        setIdleRotationText(null)
+        setIdleRotationCorgiIndex(null)
+        idleBubbleDismissRef.current = null
+      }, 3000)
+    }
+
+    const intervalId = window.setInterval(tick, 10_000)
+    return () => {
+      clearInterval(intervalId)
+      if (idleBubbleDismissRef.current) {
+        clearTimeout(idleBubbleDismissRef.current)
+        idleBubbleDismissRef.current = null
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -189,7 +262,9 @@ export function WanderingPuppy() {
     ? CORGI_SRC[2]
     : clickStep !== null
       ? CORGI_SRC[clickStep + 1]
-      : CORGI_SRC[2]
+      : idleRotationCorgiIndex !== null
+        ? CORGI_SRC[idleRotationCorgiIndex]
+        : CORGI_SRC[2]
 
   const animClass =
     activeAnim === 'bounce'
@@ -208,6 +283,7 @@ export function WanderingPuppy() {
       return CLICK_MESSAGES[clickStep]
     }
     if (greetingText) return greetingText
+    if (idleRotationText) return idleRotationText
     return null
   })()
 
