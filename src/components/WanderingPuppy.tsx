@@ -72,7 +72,7 @@ function SpeechBubble({ children }: { children: string }) {
     >
       <span className="block max-w-[min(92vw,420px)] whitespace-nowrap">{children}</span>
       <span
-        className="absolute left-1/2 top-full -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-[#1a1a1a]"
+        className="absolute left-[56px] top-full border-x-[6px] border-t-[7px] border-x-transparent border-t-[#1a1a1a]"
         aria-hidden
       />
     </div>

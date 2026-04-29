@@ -422,18 +422,20 @@ function CaseStudyNavbar() {
           >
             Work
           </Link>
-          <a href="/#resume" className={navLinkClass}>
-            Resume
-          </a>
           <a
-            href="https://www.linkedin.com"
+            href="https://www.linkedin.com/in/reshma-lokanathan19/"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className={navLinkClass}
           >
             LinkedIn
           </a>
-          <a href="/#ai-playground" className={navLinkClass}>
+          <a
+            href="https://reshma-lok.framer.website/ai-playground"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={navLinkClass}
+          >
             AI Playground
           </a>
         </div>

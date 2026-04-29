@@ -258,12 +258,14 @@ function ProjectCard({
         ) : mediaLayered ? (
           <div className="absolute inset-0 z-[1] flex min-h-0 items-center justify-center overflow-hidden p-6 md:p-8">
             {comingSoon ? <ComingSoonMediaTag /> : null}
-            <ProjectCardLayeredMedia
-              baseSrc={mediaLayered.baseSrc}
-              topRightSrc={mediaLayered.topRightSrc}
-              bottomRightSrc={mediaLayered.bottomRightSrc}
-              baseAlt={mediaLayered.baseAlt}
-            />
+            <div className="relative flex h-full max-h-full w-full min-w-0 items-center justify-center">
+              <ProjectCardLayeredMedia
+                baseSrc={mediaLayered.baseSrc}
+                topRightSrc={mediaLayered.topRightSrc}
+                bottomRightSrc={mediaLayered.bottomRightSrc}
+                baseAlt={mediaLayered.baseAlt}
+              />
+            </div>
           </div>
         ) : mediaImageSrc ? (
           <div className="absolute inset-0 z-[1] flex items-center justify-center p-6 md:p-8">
@@ -338,6 +340,7 @@ export function WorkSection() {
               comingSoon
             />
             <ProjectCard
+              companyName="Zsuite Technologies"
               projectTitle="Redesigning APR configuration workflow for financial institutions that reduced ops team dependency"
               description="Enabling self-service interest rate configuration for financial institutions by redesigning an internal, ops-only workflow."
               bullets={[
@@ -349,6 +352,7 @@ export function WorkSection() {
                 baseAlt:
                   'ZSuite FI Settings dashboard with category list, organization and subaccounts tables, and Interest Information panel',
               }}
+              comingSoon
             />
           </div>
         </div>
