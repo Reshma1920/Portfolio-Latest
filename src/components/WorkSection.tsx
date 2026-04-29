@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 const TAGS = ['AI', 'Process Automation'] as const
 
 /** Placeholder — swap copy or wire per-project data later */
@@ -148,10 +150,16 @@ export function WorkSection() {
           </div>
 
           <div className="flex flex-col gap-[62px]">
-            <ProjectCard
-              companyName="SuperLabs Inc."
-              logoSrc="/superlabs-logo.png"
-            />
+            <Link
+              to="/hdfc"
+              className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
+              aria-label="Open HDFC case study"
+            >
+              <ProjectCard
+                companyName="SuperLabs Inc."
+                logoSrc="/superlabs-logo.png"
+              />
+            </Link>
             <ProjectCard />
             <ProjectCard />
           </div>
