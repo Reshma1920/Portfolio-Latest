@@ -2,14 +2,26 @@ import { Link, useLocation } from 'react-router-dom'
 import type { RefObject } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-/** L-shaped markers: 12px arm, 2px #000 — matches specification */
+/** L-shaped markers: 12px arm, 1.5px #000 — matches specification */
 function CornerMarkers() {
   return (
     <>
-      <span className="pointer-events-none absolute left-0 top-0 z-[1] h-[12px] w-[12px] border-l-[2px] border-t-[2px] border-solid border-black" aria-hidden />
-      <span className="pointer-events-none absolute right-0 top-0 z-[1] h-[12px] w-[12px] border-r-[2px] border-t-[2px] border-solid border-black" aria-hidden />
-      <span className="pointer-events-none absolute bottom-0 left-0 z-[1] h-[12px] w-[12px] border-b-[2px] border-l-[2px] border-solid border-black" aria-hidden />
-      <span className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[12px] w-[12px] border-b-[2px] border-r-[2px] border-solid border-black" aria-hidden />
+      <span className="pointer-events-none absolute left-0 top-0 z-[1] h-[12px] w-[12px] border-l-[1.5px] border-t-[1.5px] border-solid border-black" aria-hidden />
+      <span className="pointer-events-none absolute right-0 top-0 z-[1] h-[12px] w-[12px] border-r-[1.5px] border-t-[1.5px] border-solid border-black" aria-hidden />
+      <span className="pointer-events-none absolute bottom-0 left-0 z-[1] h-[12px] w-[12px] border-b-[1.5px] border-l-[1.5px] border-solid border-black" aria-hidden />
+      <span className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[12px] w-[12px] border-b-[1.5px] border-r-[1.5px] border-solid border-black" aria-hidden />
+    </>
+  )
+}
+
+/** L-shaped markers for dark surfaces (final design frames) */
+function CornerMarkersLight() {
+  return (
+    <>
+      <span className="pointer-events-none absolute left-0 top-0 z-[1] h-[12px] w-[12px] border-l-[1.5px] border-t-[1.5px] border-solid border-white" aria-hidden />
+      <span className="pointer-events-none absolute right-0 top-0 z-[1] h-[12px] w-[12px] border-r-[1.5px] border-t-[1.5px] border-solid border-white" aria-hidden />
+      <span className="pointer-events-none absolute bottom-0 left-0 z-[1] h-[12px] w-[12px] border-b-[1.5px] border-l-[1.5px] border-solid border-white" aria-hidden />
+      <span className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[12px] w-[12px] border-b-[1.5px] border-r-[1.5px] border-solid border-white" aria-hidden />
     </>
   )
 }
@@ -34,7 +46,7 @@ function SectionPill({
 const bodyClass = 'font-dmSans text-[16px] leading-[1.7] text-[#333]'
 const sectionTitleClass = 'font-dmSans text-[32px] font-semibold text-black'
 
-/** cross_pattern.png (symlink → crosspattern.png), tiled at 40% opacity, base #f0eeea */
+/** cross_pattern.png (symlink → crosspattern.png), tiled at 40% opacity, base #f0eeea — `dark`: grid + white corner brackets */
 function ImagePlaceholder({
   width,
   height,
@@ -42,6 +54,7 @@ function ImagePlaceholder({
   className = '',
   hideCornerMarkers = false,
   noBorder = false,
+  variant = 'default',
 }: {
   width: number | string
   height: number | string
@@ -49,25 +62,75 @@ function ImagePlaceholder({
   className?: string
   hideCornerMarkers?: boolean
   noBorder?: boolean
+  variant?: 'default' | 'dark'
 }) {
+  const isDark = variant === 'dark'
   const h = typeof height === 'number' ? `${height}px` : height
   const w = typeof width === 'number' ? `${width}px` : width
-  const borderClass = noBorder ? 'border-0' : 'border border-solid border-[#e0e0e0]'
-  // Avoid min-height: 100% with height: 100% — duplicates sizing and can cause 1px row mismatch in grids.
+  const borderClass =
+    isDark ? 'border-0' : noBorder ? 'border-0' : 'border border-solid border-[#e0e0e0]'
   const minH =
     typeof height === 'number' || (typeof height === 'string' && !height.endsWith('%')) ? h : undefined
+  const bgClass = isDark ? 'bg-[#141414]' : 'bg-[#f0eeea]'
   return (
     <div
       style={{ width: w, maxWidth: '100%', height: h, ...(minH !== undefined ? { minHeight: minH } : {}) }}
-      className={`relative box-border shrink-0 bg-[#f0eeea] ${borderClass} ${className}`}
+      className={`relative box-border shrink-0 ${bgClass} ${borderClass} ${className}`}
     >
-      <div className="absolute inset-0 bg-[url('/cross_pattern.png')] bg-repeat opacity-40" aria-hidden />
-      {!hideCornerMarkers ? <CornerMarkers /> : null}
+      {isDark ? (
+        <div
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:28px_28px]"
+          aria-hidden
+        />
+      ) : (
+        <div className="absolute inset-0 bg-[url('/cross_pattern.png')] bg-repeat opacity-40" aria-hidden />
+      )}
+      {!hideCornerMarkers ? isDark ? <CornerMarkersLight /> : <CornerMarkers /> : null}
       {label ? (
-        <span className="absolute bottom-3 left-3 z-[2] bg-[rgba(247,246,242,0.92)] px-2 py-1 font-dmSans text-[13px] text-[#333]">
+        <span
+          className={`absolute bottom-3 left-3 z-[2] px-2 py-1 font-dmSans text-[13px] ${
+            isDark ? 'bg-black/60 text-white' : 'bg-[rgba(247,246,242,0.92)] text-[#333]'
+          }`}
+        >
           {label}
         </span>
       ) : null}
+    </div>
+  )
+}
+
+/** Dark frame matching ImagePlaceholder (dark): grid, corner brackets, 32px inset, image fits inside. */
+function FinalDesignFrame({
+  src,
+  alt,
+  height,
+  className = '',
+}: {
+  src: string
+  alt: string
+  height: number
+  className?: string
+}) {
+  const h = `${height}px`
+  return (
+    <div
+      style={{ height: h, minHeight: h }}
+      className={`relative box-border w-full shrink-0 overflow-hidden bg-[#141414] ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:28px_28px]"
+        aria-hidden
+      />
+      <CornerMarkersLight />
+      <div className="relative z-[1] box-border flex h-full min-h-0 w-full items-center justify-center p-[32px]">
+        <img
+          src={src}
+          alt={alt}
+          className="max-h-full w-full max-w-full object-contain"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
     </div>
   )
 }
@@ -543,9 +606,162 @@ const philosophyCards = [
   },
 ] as const
 
+const FINAL_DESIGN_BLOCKS: {
+  id: string
+  navLabel: string
+  title: string
+  desc: string
+  h: number
+  imageSrc?: string
+  imageAlt?: string
+}[] = [
+  {
+    id: 'final-design-project-listing',
+    navLabel: 'Project listing',
+    title: 'Project Listing',
+    desc:
+      'Users can view projects and locate them on a map — surfacing approvals, timelines, and project health at glance.',
+    h: 500,
+    imageSrc: '/hdfc-final-design-project-listing.png',
+    imageAlt:
+      'HDFC loan tool: PortDe project summary with sidebar, metrics, disbursement chart, and actions.',
+  },
+  {
+    id: 'final-design-disbursements',
+    navLabel: 'Disbursements',
+    title: 'Disbursements',
+    desc: 'Users can view tower listing, customer details, and request disbursements.',
+    h: 500,
+    imageSrc: '/hdfc-final-design-disbursements.png',
+    imageAlt:
+      'HDFC loan tool: PortDe disbursements tab with customer summary, loan stage timeline, and payment milestones.',
+  },
+  {
+    id: 'final-design-work-progress',
+    navLabel: 'Work progress',
+    title: 'Work Progress',
+    desc:
+      'Developers keep banks informed about construction status with structured milestones.',
+    h: 500,
+    imageSrc: '/hdfc-final-design-work-progress.png',
+    imageAlt:
+      'HDFC loan tool: PortDe tower listing with lead metrics and a grid of tower blocks, loans, and disbursement status.',
+  },
+]
+
+function FinalDesignsSection() {
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [activeIdx, setActiveIdx] = useState(0)
+
+  useLayoutEffect(() => {
+    const nodes = FINAL_DESIGN_BLOCKS.map((_, i) => sectionRefs.current[i]).filter(
+      (n): n is HTMLDivElement => Boolean(n),
+    )
+    if (nodes.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting && e.intersectionRatio > 0)
+        if (visible.length === 0) return
+        const top = visible.reduce((a, b) =>
+          a.intersectionRatio >= b.intersectionRatio ? a : b,
+        )
+        const idx = nodes.indexOf(top.target as HTMLDivElement)
+        if (idx >= 0) setActiveIdx(idx)
+      },
+      {
+        root: null,
+        rootMargin: '-12% 0px -38% 0px',
+        threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.65, 0.8, 1],
+      },
+    )
+
+    nodes.forEach((n) => observer.observe(n))
+    return () => observer.disconnect()
+  }, [])
+
+  const scrollToPanel = (i: number) => {
+    sectionRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  return (
+    <section className="relative ml-[calc(50%-50vw)] w-screen max-w-[100vw] border-b border-solid border-[#e0e0e0] bg-[#050505] py-16 text-white sm:py-24">
+      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
+        <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
+          <aside className="lg:sticky lg:top-[140px] lg:col-span-4 lg:self-start">
+            <span className="inline-block border border-white/20 bg-white/[0.06] px-2.5 py-1 font-sans text-[11px] font-medium uppercase tracking-[0.14em] text-white/75 sm:text-[12px]">
+              12 · Final designs
+            </span>
+            <h2 className="mt-6 font-dmSans text-[36px] font-semibold leading-[1.08] tracking-tight text-white sm:text-[44px] md:text-[48px]">
+              Final Designs
+            </h2>
+            <p className="mt-5 max-w-[340px] font-dmSans text-[16px] font-normal leading-relaxed text-white/50 sm:text-[17px]">
+              Shipped flows for project discovery, disbursement requests, and construction
+              progress—readable and actionable for developers, analysts, and borrowers.
+            </p>
+            <nav className="mt-10 flex flex-col gap-0.5" aria-label="Jump to final design">
+              {FINAL_DESIGN_BLOCKS.map((block, i) => (
+                <button
+                  key={block.id}
+                  type="button"
+                  onClick={() => scrollToPanel(i)}
+                  className={`border-l-2 py-2.5 pl-4 text-left font-dmSans text-[15px] font-medium transition-colors sm:text-[16px] ${
+                    activeIdx === i
+                      ? 'border-white text-white'
+                      : 'border-transparent text-white/45 hover:text-white/75'
+                  }`}
+                >
+                  {block.navLabel}
+                </button>
+              ))}
+            </nav>
+          </aside>
+
+          <div className="flex flex-col gap-20 sm:gap-24 md:gap-28 lg:col-span-8">
+            {FINAL_DESIGN_BLOCKS.map((block, i) => (
+              <div
+                key={block.id}
+                id={block.id}
+                ref={(el) => {
+                  sectionRefs.current[i] = el
+                }}
+                className="scroll-mt-[100px] md:scroll-mt-[108px]"
+              >
+                <div className="relative">
+                  {block.imageSrc != null && block.imageAlt != null ? (
+                    <FinalDesignFrame
+                      src={block.imageSrc}
+                      alt={block.imageAlt}
+                      height={block.h}
+                      className="w-full"
+                    />
+                  ) : (
+                    <ImagePlaceholder
+                      width={1100}
+                      height={block.h}
+                      className="w-full"
+                      variant="dark"
+                    />
+                  )}
+                </div>
+                <h3 className="mt-6 font-dmSans text-[18px] font-semibold leading-snug tracking-tight text-white">
+                  {block.title}
+                </h3>
+                <p className="mt-3 max-w-[560px] font-dmSans text-[16px] font-normal leading-relaxed text-[#a1a1a1] sm:text-[17px]">
+                  {block.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function HDFCCaseStudy() {
   return (
-    <div className="min-h-screen bg-[#F7F6F2] text-foreground antialiased">
+    <div className="min-h-screen overflow-x-clip bg-[#F7F6F2] text-foreground antialiased">
       <CaseStudyNavbar />
 
       <div className="pt-[calc(16px+76px)] sm:pt-[calc(20px+76px)]" />
@@ -724,28 +940,41 @@ export default function HDFCCaseStudy() {
           <div className="mb-4">
             <h2 className={sectionTitleClass}>Market Research</h2>
           </div>
-          <div className="grid gap-12 lg:grid-cols-2">
-            <div>
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                Market Analysis
-              </h3>
-              <p className={`${bodyClass} mt-4`}>
-                India&apos;s urban housing market is dominated by large multistory
-                apartment projects (over 80%) involving hundreds of units per property.
-              </p>
+          <div className="relative">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-0 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
+            />
+            <div className="grid gap-12 lg:grid-cols-2">
+              <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
+                <h3 className="font-dmSans text-[22px] font-semibold text-black">
+                  Market Analysis
+                </h3>
+                <p className={`${bodyClass} mt-4`}>
+                  India&apos;s urban housing market is dominated by large multistory
+                  apartment projects (over 80%) involving hundreds of units per property.
+                </p>
+              </div>
+              <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
+                <h3 className="font-dmSans text-[22px] font-semibold text-black">
+                  Competitor Benchmark
+                </h3>
+                <ul className={`${bodyClass} mt-4 list-none space-y-4`}>
+                  <li>
+                    ° Other banks relied on manual Excel-based data entry, increasing risk of
+                    errors.
+                  </li>
+                  <li>
+                    ° Real Estate platforms like MagicBricks and NoBroker optimized end-user
+                    browsing but lacked enterprise onboarding workflows.
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div>
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                Competitor Benchmark
-              </h3>
-              <ul className={`${bodyClass} mt-4 list-none space-y-4`}>
-                <li>° Other banks relied on manual Excel-based data entry, increasing risk of errors.</li>
-                <li>
-                  ° Real Estate platforms like MagicBricks and NoBroker optimized
-                  end-user browsing but lacked enterprise onboarding workflows.
-                </li>
-              </ul>
-            </div>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
+            />
           </div>
         </section>
 
@@ -779,240 +1008,305 @@ export default function HDFCCaseStudy() {
               <CornerMarkers />
             </div>
           </div>
-          <SectionDivider />
         </section>
 
         {/* 08 — STAKEHOLDERS */}
         <section className="border-b border-solid border-[#e0e0e0] py-14">
-          <div className="mb-10">
-            <SectionPill>08 · STAKEHOLDER ALIGNMENT</SectionPill>
+          <div className="mb-4">
+            <SectionPill>08 · ALIGNMENT</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>Stakeholder alignment</h2>
           </div>
-          <div className="relative grid lg:grid-cols-2">
-            <div className="border-b border-solid border-[#e0e0e0] p-10 lg:border-b-0 lg:border-r">
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                Business Needs
-              </h3>
-              <p className={`${bodyClass} mt-4`}>
-                Streamline home loan disbursement, reduce application completion time,
-                minimize manual intervention, drive higher customer acquisition.
-              </p>
-            </div>
-            <div className="p-10">
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                User Needs
-              </h3>
-              <p className={`${bodyClass} mt-4`}>
-                Quick, intuitive, reliable platform with guided steps, real-time status
-                updates, easy document access, and mobile responsiveness.
-              </p>
-            </div>
+
+          <div className="overflow-x-auto rounded-md border border-solid border-[#e0e0e0] bg-white">
+            <table className="w-full min-w-[720px] border-collapse font-dmSans text-left text-[15px] leading-relaxed text-[#333]">
+              <thead>
+                <tr className="border-b border-solid border-[#e0e0e0]">
+                  <th scope="col" className="bg-[#F7F6F2] px-5 py-4 font-semibold text-black sm:px-6 sm:py-5">
+                    Business Needs
+                  </th>
+                  <th
+                    scope="col"
+                    className="border-x border-solid border-[#e0e0e0] bg-[rgba(107,53,184,0.08)] px-5 py-4 font-semibold text-black sm:px-6 sm:py-5"
+                  >
+                    Balancing Both
+                  </th>
+                  <th scope="col" className="bg-[#F7F6F2] px-5 py-4 font-semibold text-black sm:px-6 sm:py-5">
+                    User Needs
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-solid border-[#e0e0e0] align-top">
+                  <td className="bg-[#F7F6F2] px-5 py-6 sm:px-6">
+                    <p className="font-semibold text-black">1. Data Entry Across Departments</p>
+                    <p className="mt-2">
+                      Each department (Credit, Legal, Technical, Disbursement) wanted their own data
+                      fields and forms to ensure complete information capture and accountability.
+                    </p>
+                  </td>
+                  <td className="border-x border-solid border-[#e0e0e0] bg-[#FDFDFD] px-5 py-6 sm:px-6">
+                    Designed a solution where shared fields auto-populate across departments.
+                    Introduced role-based views — each department could add specific fields without
+                    duplicating user input. This maintained departmental control while creating a
+                    seamless user flow.
+                  </td>
+                  <td className="bg-[#F7F6F2] px-5 py-6 sm:px-6">
+                    Customers and relationship managers wanted to avoid filling or uploading the
+                    same information repeatedly during the loan journey.
+                  </td>
+                </tr>
+                <tr className="border-b border-solid border-[#e0e0e0] align-top">
+                  <td className="bg-[#F7F6F2] px-5 py-6 sm:px-6">
+                    <p className="font-semibold text-black">2. Disbursement Compliance</p>
+                    <p className="mt-2">
+                      The business wanted strict audit trails and manual checkpoints before
+                      releasing funds to developers to ensure compliance with RBI and internal
+                      audit norms.
+                    </p>
+                  </td>
+                  <td className="border-x border-solid border-[#e0e0e0] bg-[#FDFDFD] px-5 py-6 sm:px-6">
+                    Implemented a semi-automated disbursement request flow — developers could
+                    trigger a request by uploading progress proofs, and the system would
+                    auto-validate completeness before sending for manual approval. This reduced
+                    delays while retaining compliance checkpoints.
+                  </td>
+                  <td className="bg-[#F7F6F2] px-5 py-6 sm:px-6">
+                    Developers wanted faster disbursement processing once milestones were achieved,
+                    avoiding manual back-and-forth.
+                  </td>
+                </tr>
+                <tr className="align-top">
+                  <td className="bg-[#F7F6F2] px-5 py-6 sm:px-6">
+                    <p className="font-semibold text-black">3. Loan Status Transparency</p>
+                    <p className="mt-2">
+                      Departments wanted control over when status updates were visible externally
+                      to avoid premature disclosure of internal decisions.
+                    </p>
+                  </td>
+                  <td className="border-x border-solid border-[#e0e0e0] bg-[#FDFDFD] px-5 py-6 sm:px-6">
+                    Created a tiered visibility model — certain statuses (like &ldquo;under
+                    review&rdquo; or &ldquo;awaiting approval&rdquo;) were automatically shared with
+                    customers, while sensitive backend updates remained internal until finalized.
+                    This built transparency without compromising internal control.
+                  </td>
+                  <td className="bg-[#F7F6F2] px-5 py-6 sm:px-6">
+                    Customers wanted real-time updates to reduce uncertainty and constant
+                    follow-ups.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div className="relative mt-12">
-            <ImagePlaceholder width={1100} height={350} className="w-full" />
-          </div>
-          <SectionDivider />
         </section>
 
         {/* 09 — WORKFLOW */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
+        <section className="py-14">
           <div className="mb-10">
-            <SectionPill>09 · PROPOSED WORKFLOW</SectionPill>
+            <SectionPill>09 · IDEATION</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>Proposed workflow</h2>
           </div>
-          <blockquote className="relative border border-solid border-[#e0e0e0] bg-white p-10 font-dmSans text-[19px] leading-relaxed italic text-[#333]">
-            <CornerMarkers />
-            &ldquo;This workflow transforms the fragmented, agent-dependent manual process
-            into a unified digital ecosystem that reduces processing time from 30 days to
-            just 8 days — a 73% improvement.&rdquo;
-          </blockquote>
-          <div className="mt-14 grid gap-10 md:grid-cols-3">
-            <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-6">
-              <CornerMarkers />
-              <h3 className="font-dmSans text-[17px] font-semibold text-black">
-                For HDFC
-              </h3>
-              <ul className={`${bodyClass} mt-4 space-y-3 list-none`}>
-                <li>° Central underwriting queue with SLA tracking</li>
-                <li>° Role-aware approvals and escalation paths</li>
-                <li>° Integrated risk flags with audit trails</li>
-                <li>° Dashboards for disbursement KPIs across regions</li>
-                <li>° Batch exports for treasury and reconciliation</li>
-              </ul>
-            </div>
-            <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-6">
-              <CornerMarkers />
-              <h3 className="font-dmSans text-[17px] font-semibold text-black">
-                For Customers
-              </h3>
-              <ul className={`${bodyClass} mt-4 space-y-3 list-none`}>
-                <li>° Transparent application timelines</li>
-                <li>° Digital document submission and previews</li>
-                <li>° Status notifications via SMS/email</li>
-                <li>° Self-help checklist for prerequisites</li>
-                <li>° Mobile-responsive journey for co-applicants</li>
-              </ul>
-            </div>
-            <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-6">
-              <CornerMarkers />
-              <h3 className="font-dmSans text-[17px] font-semibold text-black">
-                For Developers
-              </h3>
-              <ul className={`${bodyClass} mt-4 space-y-3 list-none`}>
-                <li>° Portfolio view of towers and disbursement stages</li>
-                <li>° Offline-friendly site progress capture</li>
-                <li>° Shared document vault with versioning</li>
-                <li>° Comment threads anchored to approvals</li>
-                <li>° Export handoffs to compliance reviewers</li>
-              </ul>
-            </div>
-          </div>
-          <SectionDivider />
-        </section>
-
-        {/* 10 — PHILOSOPHY */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
-          <div className="mb-10">
-            <SectionPill>10 · DESIGN PHILOSOPHY</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Design Philosophy</h2>
-          </div>
-          <div className="grid gap-10 sm:grid-cols-2">
-            {philosophyCards.map((card, idx) => (
-              <article
-                key={card.title}
-                className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-6"
-              >
+          <div className="grid gap-10 md:grid-cols-2 md:items-start lg:gap-12">
+            <p className="max-w-[540px] py-0 font-dmSans text-[19px] font-normal leading-relaxed text-[#333]">
+              This workflow transforms the fragmented, agent-dependent manual process into a
+              unified digital ecosystem that reduces processing time from 30 days to just 8
+              days—a 73% improvement—while eliminating dependency on bank agents as
+              intermediaries.
+            </p>
+            <div className="min-w-0">
+              <div className="relative box-border w-full border border-solid border-[#e0e0e0] bg-[#f0eeea]">
+                <div
+                  className="absolute inset-0 bg-[url('/cross_pattern.png')] bg-repeat opacity-40"
+                  aria-hidden
+                />
+                <div className="relative z-[1] p-[40px]">
+                  <img
+                    src="/hdfc-proposed-workflow.png"
+                    alt="Streamlined workflow diagram: Housing Developers and Customers submit documents to a Unified Portal, verification with HDFC Bank, and outcomes through project approval and loan sanction with an 8-day timeline."
+                    className="mx-auto h-auto w-full max-w-full object-contain"
+                    width={1024}
+                    height={812}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
                 <CornerMarkers />
-                <span className="font-sans text-[12px] font-medium text-[#6B35B8]">
-                  {String(idx + 1).padStart(2, '0')}
-                </span>
-                <h3 className="mt-4 font-dmSans text-[18px] font-semibold text-black">
-                  {card.title}
-                </h3>
-                <p className={`mt-3 ${bodyClass}`}>{card.body}</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-14 overflow-hidden rounded-sm border border-solid border-[#e0e0e0] bg-white grid grid-cols-1 divide-y divide-[#e0e0e0] md:grid-cols-3 md:divide-x md:divide-y-0">
+            {[
+              {
+                tag: '01',
+                title: 'For HDFC',
+                items: [
+                  'Central underwriting queue with SLA tracking',
+                  'Role-aware approvals and escalation paths',
+                  'Integrated risk flags with audit trails',
+                  'Dashboards for disbursement KPIs across regions',
+                  'Batch exports for treasury and reconciliation',
+                ],
+              },
+              {
+                tag: '02',
+                title: 'For Customers',
+                items: [
+                  'Transparent application timelines',
+                  'Digital document submission and previews',
+                  'Status notifications via SMS/email',
+                  'Self-help checklist for prerequisites',
+                  'Mobile-responsive journey for co-applicants',
+                ],
+              },
+              {
+                tag: '03',
+                title: 'For Developers',
+                items: [
+                  'Portfolio view of towers and disbursement stages',
+                  'Offline-friendly site progress capture',
+                  'Shared document vault with versioning',
+                  'Comment threads anchored to approvals',
+                  'Export handoffs to compliance reviewers',
+                ],
+              },
+            ].map((c) => (
+              <article key={c.tag} className="flex min-h-0 flex-col bg-white">
+                <div className="flex flex-1 flex-col px-7 py-8">
+                  <div className="inline-flex min-h-9 max-w-full flex-wrap items-center gap-x-2.5 gap-y-1 self-start rounded-md bg-[rgba(107,53,184,0.12)] px-2.5 py-2 font-dmSans text-[15px] font-semibold leading-snug">
+                    <span className="tabular-nums tracking-tight text-[#4f2d8a]">
+                      {c.tag}
+                    </span>
+                    <span className="font-[Inter,-apple-system,BlinkMacSystemFont,sans-serif] text-[13px] text-[#4f2d8a]">
+                      {c.title}
+                    </span>
+                  </div>
+                  <ul className="mt-5 list-none space-y-3 font-dmSans text-[15px] leading-[1.65] text-[#5c5c5c]">
+                    {c.items.map((item) => (
+                      <li key={`${c.tag}-${item}`}>° {item}</li>
+                    ))}
+                  </ul>
+                </div>
               </article>
             ))}
           </div>
-          <SectionDivider />
         </section>
 
-        {/* 11 — PROCESS */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
-          <div className="mb-10">
-            <SectionPill>11 · PROCESS</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Collaborative IA + Ideation</h2>
-          </div>
+        {/* 10 — PROCESS (Collaborative IA) */}
+        <section className="py-14">
+          <h2 className={sectionTitleClass}>
+            Co-creating Information Architecture with Stakeholders
+          </h2>
 
           <div className="mb-14">
-            <h3 className="font-dmSans text-[22px] font-semibold text-black">
-              Collaborative Information Architecture
-            </h3>
             <p className={`${bodyClass} mt-4 max-w-[900px]`}>
-              Mapped primary objects — projects, towers, disbursement clusters, approvals,
-              borrowers, and supervisors — ensuring every route converged onto clear
-              next actions for HDFC processors and counterparties.
+              We worked closely with stakeholders in an iterative, back-and-forth process
+              to co-create a clear and intuitive information structure. We aligned on user
+              needs, business goals, and content priorities, ensuring the architecture
+              supported seamless navigation and discoverability across the platform.
             </p>
             <div className="relative mt-8">
-              <ImagePlaceholder width={1100} height={450} className="w-full" />
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-dmSans text-[22px] font-semibold text-black">
-              Brain-Paper Dump
-            </h3>
-            <p className={`${bodyClass} mt-4 max-w-[900px]`}>
-              The team generated 68 ideations and narrowed down based on scope.
-            </p>
-            <div className="relative mt-8 grid gap-10 md:grid-cols-2">
-              <ImagePlaceholder width={500} height={350} />
-              <ImagePlaceholder width={500} height={350} />
-            </div>
-          </div>
-          <SectionDivider />
-        </section>
-
-        {/* 12 — FINAL DESIGNS */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
-          <div className="mb-12">
-            <SectionPill>12 · FINAL DESIGNS</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Final Designs</h2>
-          </div>
-
-          {[
-            {
-              title: 'Project Listing',
-              desc:
-                'Users can view projects and locate them on a map — surfacing approvals, timelines, and project health at glance.',
-              h: 500,
-            },
-            {
-              title: 'Disbursements',
-              desc:
-                'Users can view tower listing, customer details, and request disbursements.',
-              h: 500,
-            },
-            {
-              title: 'Work Progress',
-              desc:
-                'Developers keep banks informed about construction status with structured milestones.',
-              h: 500,
-            },
-          ].map((block) => (
-            <div
-              key={block.title}
-              className="border-b border-solid border-[#e0e0e0] py-14 first:pt-0 last:border-b-0 last:pb-0"
-            >
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                {block.title}
-              </h3>
-              <p className={`mt-4 max-w-[900px] ${bodyClass}`}>{block.desc}</p>
-              <div className="relative mt-8">
-                <ImagePlaceholder width={1100} height={block.h} className="w-full" />
+              <div className="relative box-border w-full border border-solid border-[#e0e0e0] bg-[#f0eeea]">
+                <div className="relative z-[1] p-[32px]">
+                  <img
+                    src="/hdfc-information-architecture.png"
+                    alt="Information architecture map: HDFC portal flows from sign-in through Register, Dashboard, project registration (RERA, multi-step project details), project management, disbursements, customer management, user management, Connect with HDFC, campaign management, and profile. Yellow modules, blue sub-screens, peach forms, purple decision nodes."
+                    className="mx-auto h-auto w-full max-w-full object-contain"
+                    width={2048}
+                    height={1512}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <CornerMarkers />
               </div>
             </div>
-          ))}
-          <SectionDivider />
+          </div>
         </section>
 
-        {/* 13 — OUTCOMES */}
+        {/* 11 — PHILOSOPHY */}
+        <section className="py-14">
+          <div className="mb-10">
+            <h2 className={sectionTitleClass}>Design Philosophy</h2>
+          </div>
+          <div className="relative overflow-hidden rounded-sm border border-solid border-[#e0e0e0] bg-white">
+            <CornerMarkers />
+            <div className="grid grid-cols-1 md:grid-cols-3">
+              {philosophyCards.map((card, idx) => (
+                <article
+                  key={card.title}
+                  className={[
+                    'flex min-h-0 flex-col border-solid border-[#e0e0e0] bg-white px-7 py-8',
+                    idx > 0 ? 'border-t' : '',
+                    idx > 0 && idx < 3 ? 'md:border-t-0' : '',
+                    idx >= 3 ? 'md:border-t' : '',
+                    idx % 3 !== 0 ? 'md:border-l' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <span className="inline-flex h-9 min-w-[2.25rem] items-center justify-center self-start rounded-md bg-[rgba(107,53,184,0.12)] px-2.5 font-sans text-[13px] font-semibold tabular-nums tracking-tight text-[#4f2d8a]">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="mt-5 font-dmSans text-[17px] font-semibold leading-snug text-[#1a1a1a]">
+                    {card.title}
+                  </h3>
+                  <p className="mt-3 font-dmSans text-[15px] leading-[1.65] text-[#5c5c5c]">
+                    {card.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <FinalDesignsSection />
+
+        {/* 13 — Outcomes & learnings */}
         <section className="pb-14 pt-14">
           <div className="mb-12">
-            <SectionPill>13 · OUTCOMES &amp; LEARNINGS</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Outcomes &amp; Learnings</h2>
+            <SectionPill>13 · Outcomes &amp; learnings</SectionPill>
+            <h2 className={`${sectionTitleClass} mt-3`}>Outcomes &amp; learnings</h2>
           </div>
-          <div className="grid gap-12 lg:grid-cols-2">
-            <div>
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                What worked
-              </h3>
-              <ul className={`${bodyClass} mt-4 list-none space-y-4`}>
-                <li>° Embedding early checkpoints with underwriting led to tighter feedback loops.</li>
-                <li>° Transparent milestones reduced inbox escalations.</li>
-                <li>° Shared component library aligned dev and QA handoffs.</li>
-              </ul>
+          <div className="relative">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-0 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
+            />
+            <div className="grid gap-12 lg:grid-cols-3">
+              <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
+                <h3 className="font-dmSans text-[22px] font-semibold text-black">
+                  What worked
+                </h3>
+                <ul className={`${bodyClass} mt-4 list-none space-y-4`}>
+                  <li>° Embedding early checkpoints with underwriting led to tighter feedback loops.</li>
+                  <li>° Transparent milestones reduced inbox escalations.</li>
+                  <li>° Shared component library aligned dev and QA handoffs.</li>
+                </ul>
+              </div>
+              <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
+                <h3 className="font-dmSans text-[22px] font-semibold text-black">
+                  What I&apos;d do differently
+                </h3>
+                <ul className={`${bodyClass} mt-4 list-none space-y-4`}>
+                  <li>° Probe regional branch variations sooner in rollout planning.</li>
+                  <li>° Instrument analytics earlier to validate KPI adoption dashboards.</li>
+                  <li>° Expand multilingual pilot coverage for tier-3 cities earlier.</li>
+                </ul>
+              </div>
+              <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
+                <h3 className="font-dmSans text-[22px] font-semibold text-black">
+                  Key takeaway
+                </h3>
+                <p className={`${bodyClass} mt-4`}>
+                  Harmonizing underwriting logic with humane status communication proved as
+                  important as optimizing screen flows — accelerating adoption required making
+                  the invisible bureaucracy legible across every stakeholder.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-dmSans text-[22px] font-semibold text-black">
-                What I&apos;d do differently
-              </h3>
-              <ul className={`${bodyClass} mt-4 list-none space-y-4`}>
-                <li>° Probe regional branch variations sooner in rollout planning.</li>
-                <li>° Instrument analytics earlier to validate KPI adoption dashboards.</li>
-                <li>° Expand multilingual pilot coverage for tier-3 cities earlier.</li>
-              </ul>
-            </div>
-          </div>
-          <div className="relative mt-16 border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-10">
-            <CornerMarkers />
-            <h3 className="font-dmSans text-[22px] font-semibold text-black">
-              Key takeaway
-            </h3>
-            <p className={`${bodyClass} mt-4`}>
-              Harmonizing underwriting logic with humane status communication proved as
-              important as optimizing screen flows — accelerating adoption required making
-              the invisible bureaucracy legible across every stakeholder.
-            </p>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
+            />
           </div>
           <SectionDivider />
         </section>

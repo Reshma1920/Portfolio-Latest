@@ -21,19 +21,19 @@ function CornerBrackets() {
   return (
     <>
       <span
-        className="pointer-events-none absolute left-0 top-0 z-[3] h-3 w-3 border-solid border-black border-l-[1.5px] border-t-[1.5px]"
+        className="pointer-events-none absolute left-0 top-0 z-[3] h-3 w-3 border-solid border-black border-l-[1px] border-t-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute right-0 top-0 z-[3] h-3 w-3 border-solid border-black border-r-[1.5px] border-t-[1.5px]"
+        className="pointer-events-none absolute right-0 top-0 z-[3] h-3 w-3 border-solid border-black border-r-[1px] border-t-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 left-0 z-[3] h-3 w-3 border-solid border-black border-b-[1.5px] border-l-[1.5px]"
+        className="pointer-events-none absolute bottom-0 left-0 z-[3] h-3 w-3 border-solid border-black border-b-[1px] border-l-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 right-0 z-[3] h-3 w-3 border-solid border-black border-b-[1.5px] border-r-[1.5px]"
+        className="pointer-events-none absolute bottom-0 right-0 z-[3] h-3 w-3 border-solid border-black border-b-[1px] border-r-[1px]"
         aria-hidden
       />
     </>
