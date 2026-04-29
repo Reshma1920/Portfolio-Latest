@@ -54,7 +54,6 @@ const HOVER_PHRASES = [
   "I've reviewed every pixel. Approved",
   "Don't scroll too fast. You'll miss the good parts",
   'She prototypes. I prototype naps',
-  'Good design and a good dog. Name a better duo',
   'This portfolio passed my sniff test',
   'Woof means wow in dog',
   'Every scroll brings you closer to hiring her',
