@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { CinematicHero } from './components/CinematicHero'
 import { ScrollToTop } from './components/ScrollToTop'
 import { WanderingPuppy } from './components/WanderingPuppy'
@@ -24,6 +25,7 @@ function App() {
           <Route path="/hdfc" element={<HDFCCaseStudy />} />
         </Routes>
         <WanderingPuppy />
+        <Analytics />
       </>
     </BrowserRouter>
   )
