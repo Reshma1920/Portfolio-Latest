@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { Link, useLocation } from 'react-router-dom'
 import type { RefObject } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -812,9 +813,20 @@ function FinalDesignsSection() {
   )
 }
 
+const hdfcDescription =
+  'A UX case study on designing an enterprise loan management platform for HDFC Bank — reducing loan processing time from 25 days to 8 days for 500K+ users.'
+
 export default function HDFCCaseStudy() {
   return (
     <div className="min-h-screen overflow-x-clip bg-[#F7F6F2] text-foreground antialiased">
+      <Helmet>
+        <title>HDFC Bank — Enterprise Loan Management Platform | Reshma Lokanathan</title>
+        <meta name="description" content={hdfcDescription} />
+        <meta property="og:title" content="HDFC Bank — Enterprise Loan Management Platform | Reshma Lokanathan" />
+        <meta property="og:description" content={hdfcDescription} />
+        <meta property="og:url" content="https://reshmalokanathan.com/hdfc" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <CaseStudyNavbar />
 
       <div className="pt-[calc(16px+76px)] sm:pt-[calc(20px+76px)]" />
