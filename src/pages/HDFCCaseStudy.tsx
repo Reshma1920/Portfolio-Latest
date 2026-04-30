@@ -860,7 +860,14 @@ export default function HDFCCaseStudy() {
         <section className="py-14">
           <div className="mb-10">
             <SectionPill>03 · CONTEXT</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Project background</h2>
+            <h2 className={`${sectionTitleClass} mt-3`}>
+              A Market Built for a Different Era
+            </h2>
+            <p className={`${bodyClass} mt-4 max-w-[900px]`}>
+              Over 80% of India&apos;s urban housing market is driven by large multistory
+              apartment projects — hundreds of units per property, multiple developers,
+              thousands of customers, all moving through the same loan pipeline.
+            </p>
           </div>
           <div className="relative">
             <span
@@ -873,10 +880,9 @@ export default function HDFCCaseStudy() {
                   Why did HDFC need this?
                 </h3>
                 <p className={`${bodyClass} mt-4`}>
-                  India&apos;s urban housing market is dominated by large multistory apartment
-                  projects. Existing onboarding systems were built for single-unit
-                  listings, leading to bottlenecks, data errors, and delayed loan
-                  processing.
+                  HDFC&apos;s existing system wasn&apos;t built for this. It was built for
+                  single-unit listings, and it showed. Loan applications moved through a
+                  patchwork of agents, spreadsheets, and legacy screens
                 </p>
               </div>
               <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
@@ -901,12 +907,23 @@ export default function HDFCCaseStudy() {
         <section className="border-b border-solid border-[#e0e0e0] py-14">
           <div className="mb-4">
             <SectionPill>04 · PROBLEM</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Problem Overview</h2>
+            <h2 className={`${sectionTitleClass} mt-3`}>
+              What 30 Days of Silence Actually Looks Like
+            </h2>
           </div>
           <blockquote className="max-w-[900px] py-0 font-dmSans text-[20px] font-normal leading-relaxed text-[#333]">
-            The current system relies on legacy technologies, leading to inefficiencies,
-            delays, and increased operational costs. It is not scalable, making it
-            challenging to handle increasing project volume and complexity.
+            <p>
+              Here&apos;s what a housing developer&apos;s loan journey looked like before
+              this platform existed:
+            </p>
+            <p className="mt-4">
+              A developer submits documents through an agent. The agent forwards them to
+              the bank. Somewhere inside, the application enters a queue no one outside
+              can see. Days pass. The developer calls the agent. The agent calls the bank.
+              Nobody has a clear answer. More days pass. A document is missing — but no one
+              told the developer, so they&apos;re still waiting. By the time the correction
+              is made, weeks have gone by.
+            </p>
           </blockquote>
           <div className="mt-12 grid gap-9 md:grid-cols-2">
             <div>
@@ -960,15 +977,16 @@ export default function HDFCCaseStudy() {
         <section className="py-14">
           <div className="mb-4">
             <SectionPill>05 · RESEARCH</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>
-              Repeating themes from interviews
-            </h2>
+            <h2 className={`${sectionTitleClass} mt-3`}>Six Cities, One Pattern</h2>
           </div>
-          <p className="max-w-[900px] py-0 font-dmSans text-[20px] font-normal leading-relaxed text-[#333]">
-            We conducted 6 interviews with housing developers in 6 cities across
-            India ranging in different scale to understand the nuances and pain
-            points.
-          </p>
+          <div className="max-w-[900px] py-0 font-dmSans text-[20px] font-normal leading-relaxed text-[#333]">
+            <p>
+              We interviewed housing developers across six cities — Mumbai, Delhi,
+              Bangalore, Chennai, Hyderabad, and Pune — ranging from boutique developers
+              with two ongoing projects to firms managing hundreds of units simultaneously.
+            </p>
+            <p className="mt-4">Three things came up in every single conversation:</p>
+          </div>
           <div className="mt-14 overflow-hidden rounded-sm border border-solid border-[#e0e0e0] bg-white grid grid-cols-1 divide-y divide-[#e0e0e0] md:grid-cols-3 md:divide-x md:divide-y-0">
             {[
               {
@@ -1084,7 +1102,9 @@ export default function HDFCCaseStudy() {
         <section className="border-b border-solid border-[#e0e0e0] py-14">
           <div className="mb-4">
             <SectionPill>08 · ALIGNMENT</SectionPill>
-            <h2 className={`${sectionTitleClass} mt-3`}>Stakeholder alignment</h2>
+            <h2 className={`${sectionTitleClass} mt-3`}>
+              Seven Teams. Seven Agendas. One Product.
+            </h2>
           </div>
 
           <div className="overflow-x-auto rounded-md border border-solid border-[#e0e0e0] bg-white">
