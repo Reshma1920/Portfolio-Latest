@@ -147,9 +147,12 @@ export function CinematicHero() {
 
       {/* Hero */}
       <header
-        className="relative z-10 flex flex-col items-center justify-center px-5 pb-[156px] text-center"
-        style={{ paddingTop: 'calc(8rem - 79px)' }}
+        className="relative z-10 flex flex-col items-center justify-center px-5 pb-[112px] text-center"
+        style={{ paddingTop: 'calc(8rem - 79px + 44px)' }}
       >
+        <span className="animate-fade-rise mb-3 inline-flex rounded-[999px] bg-[rgba(107,53,184,0.12)] px-[11px] py-1.5 font-dmSans text-[13px] font-medium leading-none text-[#6B35B8]">
+          Product Designer
+        </span>
         <h1
           className="animate-fade-rise max-w-7xl font-display text-5xl font-normal text-[#000000] sm:text-7xl md:text-8xl"
           style={{
