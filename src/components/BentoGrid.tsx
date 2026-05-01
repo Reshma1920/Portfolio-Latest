@@ -1,12 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 import { scrollToSectionId } from '../utils/scroll'
 
-const BUBBLE_USER = 'border border-white/25 bg-[rgba(92,92,92,0.1)]'
-const BUBBLE_ASSISTANT = 'border border-white/25 bg-[rgba(92,92,92,0.08)]'
+/** Near-opaque fills so text stays readable over the hero video (WCAG-friendly vs translucent gray). */
+const BUBBLE_USER =
+  'border border-neutral-900/12 bg-[rgba(247,246,242,0.94)] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]'
+const BUBBLE_ASSISTANT =
+  'border border-neutral-900/12 bg-[rgba(247,246,242,0.94)] text-neutral-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]'
 
-/** Glassmorphic chat card — backdrop + 0.15 surface, border/shadow aligned with prior bento cards */
+/** Glassmorphic chat card — slightly stronger shell so inner bubbles read cleanly */
 const chatCardClass =
-  'flex min-h-0 min-w-0 flex-col rounded-[24px] border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.15)] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.12)] backdrop-blur-[9px]'
+  'flex min-h-0 min-w-0 flex-col rounded-[24px] border border-[rgba(255,255,255,0.28)] bg-[rgba(255,255,255,0.22)] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.12)] backdrop-blur-[9px]'
+
+/** Inner glass (composer + topic pills) — matches frosted strip inside chat card */
+const glassInsetChip =
+  'border border-white/25 bg-[rgba(255,255,255,0.12)] shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-[10px]'
+
+const composerBarClass = `flex min-h-0 shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 ${glassInsetChip}`
 
 /** Glassmorphic accent: design-system purple #6B35B8 → teal #0F3D3E */
 const glassAccentIconBadge =
@@ -106,31 +115,52 @@ function scrollToWorkSection() {
   scrollToSectionId('work')
 }
 
+function usePrefersReducedMotion(): boolean {
+  const [prefers, setPrefers] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false,
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onChange = () => setPrefers(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  return prefers
+}
+
 function AssistantBlock({ payload }: { payload: AssistantPayload }) {
   return (
     <div className="mr-auto w-full max-w-full sm:max-w-md">
-      <p className="pl-[2.125rem] font-sans text-xs text-black/55">
+      <p
+        id="bento-chat-reshma-heading"
+        className="pl-[2.125rem] font-sans text-xs font-medium text-neutral-700"
+      >
         Reshma Lokanathan
       </p>
       <div className="mt-1 flex gap-1.5">
         <img
           src="/avatar-reshma.png"
-          alt="Reshma"
-          className="h-7 w-7 shrink-0 rounded-full border border-white/30 object-cover object-top [box-shadow:inset_0_1px_0_rgba(255,255,255,0.15)]"
+          alt=""
+          className="h-7 w-7 shrink-0 rounded-full border border-neutral-900/15 object-cover object-top [box-shadow:inset_0_1px_0_rgba(255,255,255,0.35)]"
           width={28}
           height={28}
           loading="lazy"
           decoding="async"
+          aria-hidden
         />
         {payload.type === 'text' ? (
           <div
-            className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[15px] leading-snug [text-wrap:pretty] text-black ${BUBBLE_ASSISTANT} [box-shadow:inset_0_1px_0_rgba(255,255,255,0.1)]`}
+            className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[15px] leading-snug [text-wrap:pretty] ${BUBBLE_ASSISTANT}`}
           >
             {payload.text}
           </div>
         ) : (
           <ul
-            className={`min-w-0 max-w-md flex-1 list-none rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[15px] leading-snug [text-wrap:pretty] text-black ${BUBBLE_ASSISTANT} [box-shadow:inset_0_1px_0_rgba(255,255,255,0.1)]`}
+            className={`min-w-0 max-w-md flex-1 list-none rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[15px] leading-snug [text-wrap:pretty] ${BUBBLE_ASSISTANT}`}
           >
             {payload.lines.map((line) => (
               <li key={line} className="mt-1 first:mt-0">
@@ -147,6 +177,7 @@ function AssistantBlock({ payload }: { payload: AssistantPayload }) {
 const FADE_MS = 300
 
 export function BentoGrid() {
+  const prefersReducedMotion = usePrefersReducedMotion()
   const [activeId, setActiveId] = useState<QaId>('default')
   const [panelOpacity, setPanelOpacity] = useState(1)
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -164,6 +195,12 @@ export function BentoGrid() {
     if (targetId === activeId) return
 
     if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current)
+
+    if (prefersReducedMotion) {
+      setActiveId(targetId)
+      setPanelOpacity(1)
+      return
+    }
 
     setPanelOpacity(0)
 
@@ -184,24 +221,40 @@ export function BentoGrid() {
       <div className="-mt-24 min-h-0 lg:-mt-[52px]">
         <div className="mx-auto w-[min(40vw,calc(100%-1.5rem))]">
           <div className={`${chatCardClass}`}>
-            <div className="shrink-0" aria-live="polite">
+            <div
+              className="shrink-0"
+              aria-live="polite"
+              aria-atomic="true"
+              role="log"
+              aria-label="Conversation preview"
+              aria-relevant="text"
+            >
               <div
-                className="flex shrink-0 flex-col gap-6 pb-5 transition-opacity duration-300 ease-out"
+                className={`flex shrink-0 flex-col gap-6 pb-5 motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none`}
                 style={{ opacity: panelOpacity }}
               >
-                <div className="min-h-0 shrink-0">
+                <article
+                  aria-labelledby="bento-chat-you-label"
+                  className="min-h-0 shrink-0"
+                >
+                  <span id="bento-chat-you-label" className="sr-only">
+                    You
+                  </span>
                   <div className="ml-auto flex w-full items-end justify-end gap-2">
                     <p
-                      className={`w-fit max-w-[min(100%,20rem)] rounded-2xl rounded-br-md px-2.5 py-1.5 text-left text-[15px] leading-snug [text-wrap:pretty] text-black [box-shadow:inset_0_1px_0_rgba(255,255,255,0.12)] ${BUBBLE_USER}`}
+                      className={`w-fit max-w-[min(100%,20rem)] rounded-2xl rounded-br-md px-2.5 py-1.5 text-left text-[15px] leading-snug [text-wrap:pretty] ${BUBBLE_USER}`}
                     >
                       {active.question}
                     </p>
                     <UserAvatar />
                   </div>
-                </div>
-                <div className="min-h-0 shrink-0 overflow-hidden">
+                </article>
+                <article
+                  aria-labelledby="bento-chat-reshma-heading"
+                  className="min-h-0 shrink-0 overflow-hidden"
+                >
                   <AssistantBlock payload={active.answer} />
-                </div>
+                </article>
               </div>
             </div>
 
@@ -212,7 +265,7 @@ export function BentoGrid() {
                     key={item.id}
                     type="button"
                     onClick={() => handlePillClick(item.id)}
-                    className="rounded-lg border border-[rgba(255,255,255,0.2)] bg-transparent px-[14px] py-[6px] font-sans text-[13px] text-black transition-colors hover:bg-[rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
+                    className={`rounded-lg px-[14px] py-[6px] font-sans text-[13px] font-medium text-neutral-900 transition-colors hover:bg-[rgba(255,255,255,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black/10 ${glassInsetChip}`}
                   >
                     {item.question}
                   </button>
@@ -220,19 +273,23 @@ export function BentoGrid() {
               </div>
 
               <div
-                className={`flex min-h-0 shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.08)] ${BUBBLE_ASSISTANT} border border-white/20`}
+                role="group"
+                aria-labelledby="bento-composer-label"
+                className={composerBarClass}
               >
-                <input
-                  type="text"
-                  readOnly
-                  className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#333333] placeholder:text-[#333333] focus:outline-none focus:ring-0"
-                  placeholder="Ask me anything..."
-                  aria-label="Ask me anything (preview)"
-                />
+                <span id="bento-composer-label" className="sr-only">
+                  Message preview only; choose a topic above or open Work to keep exploring.
+                </span>
+                <div
+                  className="min-w-0 flex-1 py-1.5 text-left text-sm text-neutral-600"
+                  aria-hidden="true"
+                >
+                  Ask me anything…
+                </div>
                 <button
                   type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#6B35B8] to-[#0F3D3E] text-white transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-                  aria-label="Send"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#6B35B8] to-[#0F3D3E] text-white transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
+                  aria-label="Go to work section"
                   onClick={scrollToWorkSection}
                 >
                   <IconSendPlane />
