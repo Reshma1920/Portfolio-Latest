@@ -22,7 +22,10 @@ function HomePage() {
         <meta property="og:type" content="website" />
       </Helmet>
       <CinematicHero />
-      <WorkSection />
+      {/* Mobile-only horizontal inset (16px); md:contents removes wrapper box on desktop. */}
+      <div className="min-w-0 max-md:px-4 md:contents">
+        <WorkSection />
+      </div>
     </>
   )
 }

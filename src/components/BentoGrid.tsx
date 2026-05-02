@@ -154,13 +154,13 @@ function AssistantBlock({ payload }: { payload: AssistantPayload }) {
         />
         {payload.type === 'text' ? (
           <div
-            className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[15px] leading-snug [text-wrap:pretty] ${BUBBLE_ASSISTANT}`}
+            className={`min-w-0 max-w-md flex-1 rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[13px] leading-snug [text-wrap:pretty] md:text-[15px] ${BUBBLE_ASSISTANT}`}
           >
             {payload.text}
           </div>
         ) : (
           <ul
-            className={`min-w-0 max-w-md flex-1 list-none rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[15px] leading-snug [text-wrap:pretty] ${BUBBLE_ASSISTANT}`}
+            className={`min-w-0 max-w-md flex-1 list-none rounded-2xl rounded-bl-md px-2.5 py-1.5 text-[13px] leading-snug [text-wrap:pretty] md:text-[15px] ${BUBBLE_ASSISTANT}`}
           >
             {payload.lines.map((line) => (
               <li key={line} className="mt-1 first:mt-0">
@@ -215,11 +215,11 @@ export function BentoGrid() {
 
   return (
     <section
-      className="relative z-10 mx-auto w-full min-h-0 max-w-7xl px-3 pb-4 sm:px-5"
+      className="relative z-10 mx-auto box-border w-full min-h-0 max-w-7xl pb-4 px-4 md:px-5"
       aria-label="Chat introduction"
     >
       <div className="-mt-24 min-h-0 lg:-mt-[52px]">
-        <div className="mx-auto w-[min(40vw,calc(100%-1.5rem))]">
+        <div className="mx-auto w-full max-w-[min(100%,380px)] md:max-w-none md:w-[min(40vw,calc(100%-1.5rem))]">
           <div className={`${chatCardClass}`}>
             <div
               className="shrink-0"
@@ -242,7 +242,7 @@ export function BentoGrid() {
                   </span>
                   <div className="ml-auto flex w-full items-end justify-end gap-2">
                     <p
-                      className={`w-fit max-w-[min(100%,20rem)] rounded-2xl rounded-br-md px-2.5 py-1.5 text-left text-[15px] leading-snug [text-wrap:pretty] ${BUBBLE_USER}`}
+                      className={`w-fit max-w-[min(100%,20rem)] rounded-2xl rounded-br-md px-2.5 py-1.5 text-left text-[13px] leading-snug [text-wrap:pretty] md:text-[15px] ${BUBBLE_USER}`}
                     >
                       {active.question}
                     </p>

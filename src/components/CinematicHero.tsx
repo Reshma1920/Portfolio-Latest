@@ -1,7 +1,9 @@
 import type { MouseEvent } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BentoGrid } from './BentoGrid'
 import { scrollToSectionId } from '../utils/scroll'
+
+const RESUME_HREF = '/resume.pdf'
 
 const VIDEO_URL =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260228_065522_522e2295-ba22-457e-8fdb-fbcd68109c73.mp4'
@@ -30,12 +32,30 @@ function computeWorkSectionActive(work: HTMLElement): boolean {
   return enter
 }
 
+function HamburgerIcon() {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      className="text-[#000000]"
+      aria-hidden
+    >
+      <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function CinematicHero() {
   const [activeNav, setActiveNav] = useState<'home' | 'work'>(() =>
     typeof window !== 'undefined' && window.location.hash === '#work'
       ? 'work'
       : 'home',
   )
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navShellRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (window.location.hash !== '#work') return
@@ -65,6 +85,47 @@ export function CinematicHero() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prevOverflow
+    }
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const onPointerDown = (e: PointerEvent) => {
+      const el = navShellRef.current
+      if (el && !el.contains(e.target as Node)) setMobileMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [mobileMenuOpen])
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false)
+  }
+
+  function onMobileNavAnchor(
+    dest: 'home' | 'work',
+    event: MouseEvent<HTMLAnchorElement>,
+  ) {
+    event.preventDefault()
+    closeMobileMenu()
+    scrollToSectionId(dest)
+  }
+
   return (
     <div
       id="home"
@@ -87,56 +148,124 @@ export function CinematicHero() {
 
       {/* viewport-fixed rail (explicitly not position:sticky — avoids quirks with overflow/stacking).
           Stays visibly on top while scrolling through Home + Work. */}
-      <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] px-3 sm:top-5 sm:px-5">
-        <nav
-          className={`pointer-events-auto mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 rounded-2xl px-7 py-5 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-out motion-reduce:transition-none ${
-            activeNav === 'work'
-              ? 'border border-black/[0.08] bg-[rgba(247,246,242,0.48)] backdrop-blur-[18px] backdrop-saturate-150 shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.75)]'
-              : 'border border-transparent bg-[#F7F6F2] shadow-[0_4px_24px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]'
-          }`}
-        >
-          <a
-            href="#home"
-            className="font-display text-3xl tracking-tight text-[#000000] transition-colors duration-300 ease-out motion-reduce:transition-none"
-            style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
-            onClick={(e) => onNavAnchor('home', e)}
+      <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] px-4 md:top-5 md:px-5">
+        <div ref={navShellRef} className="pointer-events-auto relative mx-auto w-full max-w-7xl">
+          <nav
+            className={`flex w-full flex-wrap items-center justify-between gap-4 rounded-2xl px-4 py-5 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-out motion-reduce:transition-none md:px-7 ${
+              activeNav === 'work'
+                ? 'border border-black/[0.08] bg-[rgba(247,246,242,0.48)] backdrop-blur-[18px] backdrop-saturate-150 shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.75)]'
+                : 'border border-transparent bg-[#F7F6F2] shadow-[0_4px_24px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]'
+            }`}
+            aria-label="Primary"
           >
-            Reshma Lokanathan
-          </a>
-
-          <div className="flex max-w-full flex-1 flex-wrap items-center justify-end gap-x-8 gap-y-3 md:flex-initial md:justify-end">
             <a
               href="#home"
-              className={activeNav === 'home' ? navPillActive : navPillInactive}
+              className="font-display text-3xl tracking-tight text-[#000000] transition-colors duration-300 ease-out motion-reduce:transition-none"
+              style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
               onClick={(e) => onNavAnchor('home', e)}
             >
-              Home
+              Reshma Lokanathan
             </a>
-            <a
-              href="#work"
-              className={activeNav === 'work' ? navPillActive : navPillInactive}
-              onClick={(e) => onNavAnchor('work', e)}
+
+            <div className="hidden max-w-full flex-1 flex-wrap items-center justify-end gap-x-8 gap-y-3 md:flex md:flex-initial md:justify-end">
+              <a
+                href="#home"
+                className={activeNav === 'home' ? navPillActive : navPillInactive}
+                onClick={(e) => onNavAnchor('home', e)}
+              >
+                Home
+              </a>
+              <a
+                href="#work"
+                className={activeNav === 'work' ? navPillActive : navPillInactive}
+                onClick={(e) => onNavAnchor('work', e)}
+              >
+                Work
+              </a>
+              <a
+                href="https://www.linkedin.com/in/reshma-lokanathan19/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={navLinkClass}
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://reshma-lok.framer.website/ai-playground"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={navLinkClass}
+              >
+                AI Playground
+              </a>
+            </div>
+
+            <button
+              type="button"
+              className="flex md:hidden"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="primary-mobile-nav"
+              onClick={() => setMobileMenuOpen((o) => !o)}
             >
-              Work
-            </a>
-            <a
-              href="https://www.linkedin.com/in/reshma-lokanathan19/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={navLinkClass}
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://reshma-lok.framer.website/ai-playground"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={navLinkClass}
-            >
-              AI Playground
-            </a>
+              <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
+              <HamburgerIcon />
+            </button>
+          </nav>
+
+          <div
+            id="primary-mobile-nav"
+            aria-hidden={!mobileMenuOpen}
+            className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${
+              mobileMenuOpen
+                ? 'max-h-[min(80vh,560px)]'
+                : 'pointer-events-none max-h-0'
+            }`}
+          >
+            <div className="mt-2 overflow-hidden rounded-2xl border border-black/10 bg-[#F7F6F2] shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+              <a
+                href="#home"
+                className="block border-b border-black/10 px-4 py-4 font-sans text-sm text-[#000000] hover:bg-black/[0.04]"
+                onClick={(e) => onMobileNavAnchor('home', e)}
+              >
+                Home
+              </a>
+              <a
+                href="#work"
+                className="block border-b border-black/10 px-4 py-4 font-sans text-sm text-[#000000] hover:bg-black/[0.04]"
+                onClick={(e) => onMobileNavAnchor('work', e)}
+              >
+                Work
+              </a>
+              <a
+                href={RESUME_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block border-b border-black/10 px-4 py-4 font-sans text-sm text-[#000000] hover:bg-black/[0.04]"
+                onClick={closeMobileMenu}
+              >
+                Resume
+              </a>
+              <a
+                href="https://www.linkedin.com/in/reshma-lokanathan19/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block border-b border-black/10 px-4 py-4 font-sans text-sm text-[#000000] hover:bg-black/[0.04]"
+                onClick={closeMobileMenu}
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://reshma-lok.framer.website/ai-playground"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-4 font-sans text-sm text-[#000000] hover:bg-black/[0.04]"
+                onClick={closeMobileMenu}
+              >
+                AI Playground
+              </a>
+            </div>
           </div>
-        </nav>
+        </div>
       </div>
 
       {/* Matches prior in-flow spacing: inset (top offset) + ~76px nav bar */}

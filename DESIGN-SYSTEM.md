@@ -148,6 +148,24 @@
 
 ---
 
+## 📱 Mobile — 768px breakpoint (`max-md` / `md:`)
+
+Below **768px** viewport width:
+
+### Navbar
+- Hide inline nav links; show a **hamburger** (24×24px, three horizontal lines, `#000`) on the **right** of the bar.
+- Tapping hamburger opens a **dropdown** that slides down from the bar: full width of the nav container, background **`#F7F6F2`**, items stacked vertically, **`16px` padding** per row, **`1px` border-bottom** between items (`Home`, `Work`, `Resume`, `LinkedIn`, `AI Playground`).
+- Choosing an item **closes** the menu and navigates (in-page hash or external). Tapping hamburger again **toggles** closed. Prefer closing on outside tap and **Escape**.
+- **Resume** in the mobile menu uses **`/resume.pdf`** — add the file as `public/resume.pdf` or update the href in code.
+
+### Intro chat (Bento)
+- Below **768px**, keep the chat **in document flow** under the hero (not `position: fixed`) so it does not float over other content. Width: **full width of the padded column**, **`max-width: 380px`**, centered, with horizontal padding from the section (`16px`) so nothing touches the viewport edge or overflows.
+
+### Horizontal page padding
+- Below 768px use **`16px`** left/right horizontal padding on page sections where applied (nav rail, intro chat shell, work band wrapper on home). Desktop (`md+`) spacing stays unchanged.
+
+---
+
 ## 📝 How to use in Cursor
 Start every prompt with:
 `@DESIGN-SYSTEM.md — follow all tokens, components, and rules defined here.`
