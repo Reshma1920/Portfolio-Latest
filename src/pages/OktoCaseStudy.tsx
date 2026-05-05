@@ -90,6 +90,10 @@ function ImagePlaceholder({
   labelClassName,
   /** Screen recording or demo clip (MOV/WebM/MP4); native controls, above cross pattern when visible. */
   videoSrc,
+  /** Wrapper around `<video>` when `videoSrc` is set; default centered with `p-2 sm:p-3`. */
+  videoContainerClassName,
+  /** Extra classes on `<video>` when `videoSrc` is set (e.g. hover-only controls helper). */
+  videoClassName,
 }: {
   width: number | string
   height: number | string
@@ -114,6 +118,8 @@ function ImagePlaceholder({
   /** Override label chip styles (default: cream translucent bg). */
   labelClassName?: string
   videoSrc?: string
+  videoContainerClassName?: string
+  videoClassName?: string
 }) {
   const h = typeof height === 'number' ? `${height}px` : height
   const w = typeof width === 'number' ? `${width}px` : width
@@ -218,7 +224,12 @@ function ImagePlaceholder({
         />
       ) : null}
       {videoSrc ? (
-        <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center p-2 sm:p-3 [&_video]:pointer-events-auto">
+        <div
+          className={
+            videoContainerClassName ??
+            'pointer-events-none absolute inset-0 z-[1] flex items-center justify-center p-2 sm:p-3 [&_video]:pointer-events-auto'
+          }
+        >
           <video
             ref={videoRef}
             src={videoSrc}
@@ -226,7 +237,11 @@ function ImagePlaceholder({
             muted
             playsInline
             preload="auto"
-            className="h-full w-full max-h-full max-w-full object-contain"
+            className={
+              videoClassName
+                ? `max-h-full max-w-full shrink-0 object-contain ${videoClassName}`
+                : 'h-full w-full max-h-full max-w-full object-contain'
+            }
             aria-label={label ?? 'Screen recording'}
           />
         </div>
@@ -569,15 +584,30 @@ export default function OktoCaseStudy() {
       <main className="mx-auto w-full max-w-[1200px] px-4 pb-28 sm:px-6">
         {/* Hero */}
         <section className="border-y border-solid border-[#e0e0e0] py-14">
-          <HeroTagPill>Superlabs Inc</HeroTagPill>
-          <h1 className="mt-6 max-w-[920px] font-dmSans text-[44px] font-semibold leading-[1.1] text-black sm:text-[48px]">
-            Designing a Voice and Recording-Led Setup Flow for AI Workflow Automation
-          </h1>
-          <p className={`mt-6 max-w-[900px] ${bodyClass}`}>
-            Superlabs is a pre-seed startup with a bold idea: non-technical people should be able to
-            automate their own workflows, without IT, without a developer, and without a three-month
-            implementation. We were brought in to figure out what that actually looks like.
-          </p>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start lg:gap-10">
+            <div className="min-w-0">
+              <HeroTagPill>Superlabs Inc</HeroTagPill>
+              <h1 className="mt-6 max-w-[920px] font-dmSans text-[44px] font-semibold leading-[1.1] text-black sm:text-[48px]">
+                Voice and Recording-Led Setup Flow for AI Workflow Automation
+              </h1>
+              <p className={`mt-6 max-w-[900px] ${bodyClass}`}>
+                Superlabs is a pre-seed startup with a bold idea: non-technical people should be able to
+                automate their own workflows, without IT, without a developer, and without a three-month
+                implementation. We were brought in to figure out what that actually looks like.
+              </p>
+            </div>
+            <div className="min-w-0">
+              <ImagePlaceholder
+                width="100%"
+                height={380}
+                className="w-full"
+                videoSrc="/okto-hero-video.mov"
+                hideCrossPattern
+                videoContainerClassName="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center p-[18px] [&_video]:pointer-events-auto"
+                videoClassName="okto-video-controls-hover"
+              />
+            </div>
+          </div>
           <div
             ref={statsRef}
             className="mt-12 grid grid-cols-1 gap-px border border-solid border-[#e0e0e0] bg-[#e0e0e0] sm:grid-cols-2 lg:grid-cols-5"

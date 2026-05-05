@@ -125,6 +125,8 @@ type ProjectCardProps = {
   tags?: readonly string[]
   /** Pill at bottom-left of media area (white background) */
   comingSoon?: boolean
+  /** When true, video plays from start to natural end (no HDFC-style in/out trim) */
+  mediaVideoFullDuration?: boolean
 }
 
 function ProjectCard({
@@ -138,6 +140,7 @@ function ProjectCard({
   mediaLayered,
   tags = TAGS,
   comingSoon = false,
+  mediaVideoFullDuration = false,
 }: ProjectCardProps = {}) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -154,7 +157,11 @@ function ProjectCard({
           void el.play().catch(() => {})
         } else {
           el.pause()
-          el.currentTime = VIDEO_TRIM_START_SEC
+          if (!mediaVideoFullDuration) {
+            el.currentTime = VIDEO_TRIM_START_SEC
+          } else {
+            el.currentTime = 0
+          }
         }
       },
       { threshold: [0, 0.25, 0.5, 0.75, 1] },
@@ -162,7 +169,7 @@ function ProjectCard({
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [mediaVideoSrc])
+  }, [mediaVideoSrc, mediaVideoFullDuration])
 
   return (
     <article className="relative flex w-full flex-col border-x border-solid border-[#e0e0e0] bg-white md:flex-row md:items-stretch">
@@ -244,15 +251,23 @@ function ProjectCard({
               loop
               playsInline
               aria-hidden
-              onLoadedMetadata={(e) => {
-                e.currentTarget.currentTime = VIDEO_TRIM_START_SEC
-              }}
-              onTimeUpdate={(e) => {
-                const v = e.currentTarget
-                if (v.currentTime >= VIDEO_TRIM_END_SEC) {
-                  v.currentTime = VIDEO_TRIM_START_SEC
-                }
-              }}
+              onLoadedMetadata={
+                mediaVideoFullDuration
+                  ? undefined
+                  : (e) => {
+                      e.currentTarget.currentTime = VIDEO_TRIM_START_SEC
+                    }
+              }
+              onTimeUpdate={
+                mediaVideoFullDuration
+                  ? undefined
+                  : (e) => {
+                      const v = e.currentTarget
+                      if (v.currentTime >= VIDEO_TRIM_END_SEC) {
+                        v.currentTime = VIDEO_TRIM_START_SEC
+                      }
+                    }
+              }
             />
           </div>
         ) : mediaLayered ? (
@@ -302,6 +317,32 @@ export function WorkSection() {
 
           <div className="flex flex-col gap-[62px]">
             <Link
+              to="/okto"
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
+              className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
+              aria-label="Open Okto case study (SuperLabs)"
+            >
+              <ProjectCard
+                companyName="SuperLabs Inc."
+                logoSrc="/superlabs-logo.png"
+                projectTitle="Voice and Recording-Led Setup Flow for AI Workflow Automation"
+                description="Designing for the tension between delegation and control — where users hand off work to AI without losing transparency or trust."
+                bullets={[
+                  'Contributed to defining the product direction and core product surfaces for the pre-seed AI startup.',
+                ]}
+                tags={[
+                  'Enterprise UX',
+                  'B2B',
+                  'Workflow Automation',
+                  'Privacy & Trust',
+                ]}
+                mediaVideoSrc="/superlabs-hero-video.mov"
+                mediaVideoFullDuration
+              />
+            </Link>
+            <Link
               to="/hdfc"
               onClick={() => {
                 window.scrollTo(0, 0)
@@ -315,30 +356,11 @@ export function WorkSection() {
                 projectTitle="Enterprise Loan Management Platform for India's Largest Private Bank"
                 description="End-to-end B2B platform enabling real estate developers to manage construction-linked loan disbursements, track project progress, and eliminate dependency on bank agents — built for scale across 500K+ users."
                 bullets={[
-                  '12-step workflow consolidated into 1 unified system for 500K+ users',
-                  'Reduced loan processing time from 25 days to 8 days — a 68% improvement',
-                  'Delivered modular, component-based designs enabling rapid implementation in React.js',
+                  'Designed a unified loan management ecosystem improving sensing time by 68%, 500k+ adoption in 1 year.',
                 ]}
                 mediaVideoSrc="/HDFC%20Video%20.mp4"
               />
             </Link>
-            <ProjectCard
-              companyName="SuperLabs Inc."
-              logoSrc="/superlabs-logo.png"
-              projectTitle="AI Workflow Automation: Designing the First-Time Workflow Setup Experience"
-              description="This project explores how non-technical professionals set up AI-powered workflow automation for the first time — recording their processes, transferring institutional knowledge, and delegating work to AI while maintaining trust, transparency, and data security throughout."
-              bullets={[
-                'Designed around core tensions between delegation and control — ensuring users can hand off their work to AI while maintaining transparency, traceability, and confidence that the system understands their process correctly.',
-              ]}
-              tags={[
-                'Enterprise UX',
-                'B2B',
-                'Workflow Automation',
-                'Privacy & Trust',
-              ]}
-              mediaImageSrc="/superlabs-impact-dashboard.png"
-              comingSoon
-            />
             <ProjectCard
               companyName="Zsuite Technologies"
               projectTitle="Redesigning APR configuration workflow for financial institutions that reduced ops team dependency"
