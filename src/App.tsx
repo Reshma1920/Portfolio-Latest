@@ -6,6 +6,7 @@ import { ScrollToTop } from './components/ScrollToTop'
 import { WanderingPuppy } from './components/WanderingPuppy'
 import { WorkSection } from './components/WorkSection'
 import HDFCCaseStudy from './pages/HDFCCaseStudy'
+import OktoCaseStudy from './pages/OktoCaseStudy'
 
 const homeDescription =
   'Portfolio of Reshma Lokanathan — product designer specializing in enterprise and fintech, with case studies in complex workflows and design systems.'
@@ -39,6 +40,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/hdfc" element={<HDFCCaseStudy />} />
+            <Route path="/okto" element={<OktoCaseStudy />} />
           </Routes>
           <WanderingPuppy />
           <Analytics />
