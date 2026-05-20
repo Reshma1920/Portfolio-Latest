@@ -178,12 +178,9 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const wrapNode = wrapRef.current
-    const canvasNode = canvasRef.current
-    if (!wrapNode || !canvasNode) return
-
-    const wrapEl: HTMLDivElement = wrapNode
-    const canvasEl: HTMLCanvasElement = canvasNode
+    const wrap = wrapRef.current
+    const canvas = canvasRef.current
+    if (!wrap || !canvas) return
 
     let w = 1
     let h = 1
@@ -233,7 +230,12 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
     function sampleFromImage(): boolean {
       if (!loader.complete || loader.naturalWidth === 0) return false
 
-      const rect = wrapEl.getBoundingClientRect()
+      const wrap = wrapRef.current
+      const canvas = canvasRef.current
+      if (!wrap) return false
+      if (!canvas) return false
+
+      const rect = wrap.getBoundingClientRect()
       w = Math.max(1, Math.floor(rect.width))
       h = Math.max(1, Math.floor(rect.height))
 
@@ -314,12 +316,12 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
       bgFill = '#F7F6F2'
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvasEl.width = Math.floor(w * dpr)
-      canvasEl.height = Math.floor(h * dpr)
-      canvasEl.style.width = `${w}px`
-      canvasEl.style.height = `${h}px`
+      canvas.width = Math.floor(w * dpr)
+      canvas.height = Math.floor(h * dpr)
+      canvas.style.width = `${w}px`
+      canvas.style.height = `${h}px`
 
-      const ctx = canvasEl.getContext('2d')
+      const ctx = canvas.getContext('2d')
       if (!ctx) return false
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
@@ -424,7 +426,9 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
 
     function drawFrameStatic() {
       if (!ready || cellCount === 0) return
-      const ctx = canvasEl.getContext('2d')
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
       if (!ctx) return
       ctx.fillStyle = bgFill
       ctx.fillRect(0, 0, w, h)
@@ -441,7 +445,9 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
 
     function drawFrame() {
       if (!ready || cellCount === 0) return
-      const ctx = canvasEl.getContext('2d')
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
       if (!ctx) return
 
       frame++
@@ -544,7 +550,9 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
     }
 
     function clientToLocal(clientX: number, clientY: number) {
-      const rect = canvasEl.getBoundingClientRect()
+      const canvas = canvasRef.current
+      if (!canvas) return { x: 0, y: 0 }
+      const rect = canvas.getBoundingClientRect()
       const scaleX = rect.width > 0 ? w / rect.width : 1
       const scaleY = rect.height > 0 ? h / rect.height : 1
       return {
@@ -583,16 +591,16 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
       startLoop()
     }
 
-    canvasEl.addEventListener('pointermove', onPointerMove)
-    canvasEl.addEventListener('pointerenter', onPointerMove)
-    canvasEl.addEventListener('pointerleave', onPointerLeave)
+    canvas.addEventListener('pointermove', onPointerMove)
+    canvas.addEventListener('pointerenter', onPointerMove)
+    canvas.addEventListener('pointerleave', onPointerLeave)
 
     const ro = new ResizeObserver(() => {
       requestAnimationFrame(() => {
         if (sampleFromImage()) drawFrame()
       })
     })
-    ro.observe(wrapEl)
+    ro.observe(wrap)
 
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -600,7 +608,7 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
       },
       { threshold: 0 },
     )
-    io.observe(wrapEl)
+    io.observe(wrap)
 
     loader.addEventListener('load', onImageReady)
     loader.src = src
@@ -613,9 +621,9 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
       ro.disconnect()
       io.disconnect()
       loader.removeEventListener('load', onImageReady)
-      canvasEl.removeEventListener('pointermove', onPointerMove)
-      canvasEl.removeEventListener('pointerenter', onPointerMove)
-      canvasEl.removeEventListener('pointerleave', onPointerLeave)
+      canvas.removeEventListener('pointermove', onPointerMove)
+      canvas.removeEventListener('pointerenter', onPointerMove)
+      canvas.removeEventListener('pointerleave', onPointerLeave)
     }
   }, [src])
 

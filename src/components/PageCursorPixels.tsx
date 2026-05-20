@@ -68,19 +68,13 @@ export function PageCursorPixels() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const canvasNode = canvasRef.current
-    if (!canvasNode) return
+    const canvas = canvasRef.current
+    if (!canvas) return
 
     const reducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches
     if (reducedMotion) return
-
-    const ctxNode = canvasNode.getContext('2d')
-    if (!ctxNode) return
-
-    const canvasEl: HTMLCanvasElement = canvasNode
-    const ctx: CanvasRenderingContext2D = ctxNode
 
     let w = 0
     let h = 0
@@ -99,13 +93,18 @@ export function PageCursorPixels() {
     const maxRadius = CLUSTER_BASE + CLUSTER_WOBBLE + STRIDE * 2
 
     function resize() {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
       w = window.innerWidth
       h = window.innerHeight
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvasEl.width = Math.floor(w * dpr)
-      canvasEl.height = Math.floor(h * dpr)
-      canvasEl.style.width = `${w}px`
-      canvasEl.style.height = `${h}px`
+      canvas.width = Math.floor(w * dpr)
+      canvas.height = Math.floor(h * dpr)
+      canvas.style.width = `${w}px`
+      canvas.style.height = `${h}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
@@ -138,6 +137,11 @@ export function PageCursorPixels() {
     }
 
     function drawFrame() {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
       const now = performance.now()
       const idle = idleFade(now)
 
@@ -211,6 +215,10 @@ export function PageCursorPixels() {
       }
 
       raf = 0
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
       ctx.clearRect(0, 0, w, h)
       trail.length = 0
     }
