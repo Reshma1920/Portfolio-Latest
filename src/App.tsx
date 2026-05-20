@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import { CinematicHero } from './components/CinematicHero'
 import { PageCursorPixels } from './components/PageCursorPixels'
+import { PortfolioInteractionSounds } from './components/PortfolioInteractionSounds'
 import { ScrollToTop } from './components/ScrollToTop'
 import { WorkSection } from './components/WorkSection'
 import HDFCCaseStudy from './pages/HDFCCaseStudy'
@@ -43,6 +44,7 @@ function App() {
     <HelmetProvider>
       <BrowserRouter>
         <>
+          <PortfolioInteractionSounds />
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<HomePage />} />

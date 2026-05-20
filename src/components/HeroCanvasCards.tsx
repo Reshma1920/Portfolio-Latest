@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  playClickSound,
+  playHoverSound,
+  unlockPortfolioAudio,
+} from '../audio/portfolioAudio'
 
 type CardDef = {
   id: string
@@ -158,11 +163,17 @@ function OverlayCard({
       >
         <button
           type="button"
+          data-hero-canvas-sound
           aria-label={minimized ? `Expand ${card.title}` : `Minimize ${card.title}`}
           aria-expanded={!minimized}
           className="inline-flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border border-solid border-[#444444] bg-transparent p-0 font-dmSans text-[11px] font-medium leading-none text-[#888888] transition-colors hover:border-[#666666] hover:text-[#bbbbbb]"
           onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => onToggleMinimize(card.id)}
+          onMouseEnter={() => playHoverSound()}
+          onClick={() => {
+            unlockPortfolioAudio()
+            playClickSound()
+            onToggleMinimize(card.id)
+          }}
         >
           <span aria-hidden>{minimized ? '+' : '−'}</span>
         </button>
@@ -301,6 +312,7 @@ export function HeroCanvasCards({ containerRef }: Props) {
 
   return (
     <div
+      data-hero-canvas-cards
       className={`pointer-events-none absolute inset-0 z-10 ${laidOut ? '' : 'opacity-0'}`}
     >
       {CARDS.map((card) => (
