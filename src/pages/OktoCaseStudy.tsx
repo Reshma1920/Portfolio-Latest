@@ -1,26 +1,26 @@
 import { Helmet } from 'react-helmet-async'
-import { Link, useLocation } from 'react-router-dom'
+import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-/** L-shaped markers: 12px arm, 1.5px #000 */
+/** L-shaped markers: 8px arm, 1.5px #000 */
 function CornerMarkers() {
   return (
     <>
       <span
-        className="pointer-events-none absolute left-0 top-0 z-[1] h-[12px] w-[12px] border-l-[1.5px] border-t-[1.5px] border-solid border-black"
+        className="pointer-events-none absolute left-0 top-0 z-[1] h-[8px] w-[8px] border-l-[1.5px] border-t-[1.5px] border-solid border-black"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute right-0 top-0 z-[1] h-[12px] w-[12px] border-r-[1.5px] border-t-[1.5px] border-solid border-black"
+        className="pointer-events-none absolute right-0 top-0 z-[1] h-[8px] w-[8px] border-r-[1.5px] border-t-[1.5px] border-solid border-black"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 left-0 z-[1] h-[12px] w-[12px] border-b-[1.5px] border-l-[1.5px] border-solid border-black"
+        className="pointer-events-none absolute bottom-0 left-0 z-[1] h-[8px] w-[8px] border-b-[1.5px] border-l-[1.5px] border-solid border-black"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[12px] w-[12px] border-b-[1.5px] border-r-[1.5px] border-solid border-black"
+        className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[8px] w-[8px] border-b-[1.5px] border-r-[1.5px] border-solid border-black"
         aria-hidden
       />
     </>
@@ -312,59 +312,6 @@ function CalloutBox({
   )
 }
 
-const navLinkClass = 'text-sm text-muted transition-colors hover:text-foreground'
-const navPillBase =
-  'inline-flex items-center rounded-[12px] border-[1.5px] px-3.5 py-1.5 text-sm transition-[color,border-color] duration-200 motion-reduce:transition-none'
-const navPillInactive = `${navPillBase} border-transparent bg-transparent text-muted hover:text-foreground`
-const navPillActive = `${navPillBase} border-[#111] bg-transparent text-foreground`
-
-function CaseStudyNavbar() {
-  const { pathname, hash } = useLocation()
-  const onCaseStudy = pathname === '/okto'
-  const atWorkAnchor = pathname === '/' && (hash === '#work' || hash.startsWith('#work'))
-  const homeActive = pathname === '/' && !atWorkAnchor && !onCaseStudy
-  const workActive = onCaseStudy || atWorkAnchor
-
-  return (
-    <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] px-3 sm:top-5 sm:px-5">
-      <nav className="pointer-events-auto mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 rounded-2xl border border-transparent bg-[#F7F6F2] px-7 py-5 shadow-[0_4px_24px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]">
-        <Link
-          to="/"
-          className="font-display text-3xl tracking-tight text-[#000000] transition-colors duration-300"
-          style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
-        >
-          Reshma Lokanathan
-        </Link>
-
-        <div className="flex max-w-full flex-1 flex-wrap items-center justify-end gap-x-8 gap-y-3 md:flex-initial md:justify-end">
-          <Link to="/" className={homeActive ? navPillActive : navPillInactive}>
-            Home
-          </Link>
-          <Link to={{ pathname: '/', hash: 'work' }} className={workActive ? navPillActive : navPillInactive}>
-            Work
-          </Link>
-          <a
-            href="https://www.linkedin.com/in/reshma-lokanathan19/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={navLinkClass}
-          >
-            LinkedIn
-          </a>
-          <a
-            href="https://reshma-lok.framer.website/ai-playground"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={navLinkClass}
-          >
-            AI Playground
-          </a>
-        </div>
-      </nav>
-    </div>
-  )
-}
-
 function useIntersectionOnce<T extends HTMLElement>(ref: RefObject<T | null>, onIntersect: () => void) {
   const cbRef = useRef(onIntersect)
   cbRef.current = onIntersect
@@ -577,9 +524,8 @@ export default function OktoCaseStudy() {
         <meta property="og:url" content="https://reshmalokanathan.com/okto" />
         <meta property="og:type" content="website" />
       </Helmet>
-      <CaseStudyNavbar />
-
-      <div className="pt-[calc(16px+76px)] sm:pt-[calc(20px+76px)]" />
+      <SiteNav variant="case-study" />
+      <SiteNavSpacer />
 
       <main className="mx-auto w-full max-w-[1200px] px-4 pb-28 sm:px-6">
         {/* Hero */}
@@ -1212,13 +1158,6 @@ export default function OktoCaseStudy() {
 
         <OktoFinalDesignsSection />
       </main>
-
-      <footer className="border-t border-solid border-[#e0e0e0] bg-[#F7F6F2] px-4 py-12 sm:px-6">
-        <div className="mx-auto max-w-[1200px] font-dmSans text-[14px] leading-relaxed text-[#555]">
-          HCDE Capstone · Team Brunch Club · Superlabs Inc., Seattle · Spring 2026. All participant quotes are
-          anonymized. Project ongoing.
-        </div>
-      </footer>
     </div>
   )
 }

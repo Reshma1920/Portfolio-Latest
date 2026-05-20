@@ -25,19 +25,19 @@ function CornerBrackets() {
   return (
     <>
       <span
-        className="pointer-events-none absolute left-0 top-0 z-[3] h-3 w-3 border-solid border-black border-l-[1px] border-t-[1px]"
+        className="pointer-events-none absolute left-0 top-0 z-[3] h-2 w-2 border-solid border-black border-l-[1px] border-t-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute right-0 top-0 z-[3] h-3 w-3 border-solid border-black border-r-[1px] border-t-[1px]"
+        className="pointer-events-none absolute right-0 top-0 z-[3] h-2 w-2 border-solid border-black border-r-[1px] border-t-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 left-0 z-[3] h-3 w-3 border-solid border-black border-b-[1px] border-l-[1px]"
+        className="pointer-events-none absolute bottom-0 left-0 z-[3] h-2 w-2 border-solid border-black border-b-[1px] border-l-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 right-0 z-[3] h-3 w-3 border-solid border-black border-b-[1px] border-r-[1px]"
+        className="pointer-events-none absolute bottom-0 right-0 z-[3] h-2 w-2 border-solid border-black border-b-[1px] border-r-[1px]"
         aria-hidden
       />
     </>
@@ -302,7 +302,7 @@ function ProjectCard({
 
 export function WorkSection() {
   return (
-    <section id="work" className="w-full bg-[#F7F6F2] font-dmSans">
+    <section id="work" className="w-full font-dmSans">
       {/* Outer padding matches CinematicHero nav wrapper (px-3 sm:px-5); inner width matches nav bar (max-w-7xl). */}
       <div className="px-3 sm:px-5">
         <div className="mx-auto w-full max-w-7xl pb-[80px] pt-[80px]">
