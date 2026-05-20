@@ -14,7 +14,7 @@ export function CinematicHero() {
 
       {/* Hero */}
       <header className="relative z-10 mx-auto mt-14 w-full max-w-7xl px-5 pb-2 text-left sm:mt-16 md:mt-24 md:pb-4 lg:mt-28">
-        <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.42fr)] md:items-center md:gap-x-12 lg:gap-x-16">
+        <div className="grid gap-10 pt-20 md:grid-cols-[minmax(0,1fr)_minmax(0,0.42fr)] md:items-center md:gap-x-12 lg:gap-x-16">
           <div className="min-w-0">
             <span className="animate-fade-rise mb-4 inline-flex rounded-none bg-[rgba(107,53,184,0.12)] px-[11px] py-1.5 font-dmSans text-[13px] font-medium leading-none text-[#6B35B8]">
               Product Designer
