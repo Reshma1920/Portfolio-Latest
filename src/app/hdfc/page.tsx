@@ -1,6 +1,6 @@
 'use client'
 
-import HDFCCaseStudy from '../../pages/HDFCCaseStudy'
+import HDFCCaseStudy from '../../case-studies/HDFCCaseStudy'
 
 export default function Page() {
   return <HDFCCaseStudy />
