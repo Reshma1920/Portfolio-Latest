@@ -200,10 +200,13 @@ export function HeroCanvasCards({ containerRef }: Props) {
     id: string
     offsetX: number
     offsetY: number
+    startClientX: number
+    startClientY: number
+    moved: boolean
   } | null>(null)
 
   const [minimized, setMinimized] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(CARDS.map((c) => [c.id, false])),
+    Object.fromEntries(CARDS.map((c) => [c.id, true])),
   )
   const [positions, setPositions] = useState<Record<string, Pos>>({})
   const [laidOut, setLaidOut] = useState(false)
@@ -259,6 +262,12 @@ export function HeroCanvasCards({ containerRef }: Props) {
       const box = containerRef.current
       if (!drag || !box) return
 
+      if (!drag.moved) {
+        const dx = e.clientX - drag.startClientX
+        const dy = e.clientY - drag.startClientY
+        if (dx * dx + dy * dy > 25) drag.moved = true
+      }
+
       const rect = box.getBoundingClientRect()
       const el = cardRefs.current.get(drag.id)
       const cardW = el?.offsetWidth ?? 280
@@ -272,7 +281,11 @@ export function HeroCanvasCards({ containerRef }: Props) {
     }
 
     function onPointerUp() {
+      const drag = dragRef.current
       dragRef.current = null
+      if (drag && !drag.moved) {
+        handleToggleMinimize(drag.id)
+      }
     }
 
     window.addEventListener('pointermove', onPointerMove)
@@ -295,6 +308,9 @@ export function HeroCanvasCards({ containerRef }: Props) {
       id,
       offsetX: e.clientX - cardRect.left,
       offsetY: e.clientY - cardRect.top,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      moved: false,
     }
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
   }
