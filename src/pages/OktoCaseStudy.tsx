@@ -1,3 +1,5 @@
+'use client'
+
 import { Helmet } from 'react-helmet-async'
 import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
 import type { CSSProperties, ReactNode, RefObject } from 'react'

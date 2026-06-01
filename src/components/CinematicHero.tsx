@@ -1,3 +1,5 @@
+'use client'
+
 import { SiteNav, SiteNavSpacer } from './SiteNav'
 import { HeroPixelTorch } from './HeroPixelTorch'
 

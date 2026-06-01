@@ -1,6 +1,9 @@
+'use client'
+
 import type { MouseEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { scrollToSectionId } from '../utils/scroll'
 
 const RESUME_HREF = '/resume.pdf'
@@ -35,10 +38,13 @@ type SiteNavProps = {
 }
 
 export function SiteNav({ variant }: SiteNavProps) {
-  const { pathname, hash } = useLocation()
+  const pathname = usePathname()
   const isCaseStudy = variant === 'case-study'
   const onCaseStudyRoute = pathname === '/okto' || pathname === '/hdfc'
-  const atWorkAnchor = pathname === '/' && (hash === '#work' || hash.startsWith('#work'))
+  const atWorkAnchor =
+    pathname === '/' &&
+    typeof window !== 'undefined' &&
+    (window.location.hash === '#work' || window.location.hash.startsWith('#work'))
 
   const [homeScrollNav, setHomeScrollNav] = useState<'home' | 'work'>(() =>
     typeof window !== 'undefined' && window.location.hash === '#work' ? 'work' : 'home',
@@ -130,7 +136,7 @@ export function SiteNav({ variant }: SiteNavProps) {
 
   const nameLink = isCaseStudy ? (
     <Link
-      to="/"
+      href="/"
       className="shrink-0 text-[#000000] transition-colors duration-300 ease-out hover:text-foreground motion-reduce:transition-none"
       style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
       onClick={closeMobileMenu}
@@ -154,7 +160,7 @@ export function SiteNav({ variant }: SiteNavProps) {
 
   const homeLink = isCaseStudy ? (
     <Link
-      to="/"
+      href="/"
       aria-current={homeActive ? 'page' : undefined}
       className={homeActive ? navLinkActiveClass : navLinkClass}
       onClick={closeMobileMenu}
@@ -174,7 +180,7 @@ export function SiteNav({ variant }: SiteNavProps) {
 
   const workLink = isCaseStudy ? (
     <Link
-      to={{ pathname: '/', hash: 'work' }}
+      href="/#work"
       aria-current={workActive ? 'page' : undefined}
       className={workActive ? navLinkActiveClass : navLinkClass}
       onClick={closeMobileMenu}
@@ -194,7 +200,7 @@ export function SiteNav({ variant }: SiteNavProps) {
 
   const mobileHomeLink = isCaseStudy ? (
     <Link
-      to="/"
+      href="/"
       className={`block py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
       onClick={closeMobileMenu}
     >
@@ -212,7 +218,7 @@ export function SiteNav({ variant }: SiteNavProps) {
 
   const mobileWorkLink = isCaseStudy ? (
     <Link
-      to={{ pathname: '/', hash: 'work' }}
+      href="/#work"
       className={`block py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
       onClick={closeMobileMenu}
     >

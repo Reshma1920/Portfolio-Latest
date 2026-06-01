@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 const VIDEO_TRIM_START_SEC = 7
 const VIDEO_TRIM_END_SEC = 32
@@ -317,7 +319,7 @@ export function WorkSection() {
 
           <div className="flex flex-col gap-[62px]">
             <Link
-              to="/okto"
+              href="/okto"
               onClick={() => {
                 window.scrollTo(0, 0)
               }}
@@ -343,7 +345,7 @@ export function WorkSection() {
               />
             </Link>
             <Link
-              to="/hdfc"
+              href="/hdfc"
               onClick={() => {
                 window.scrollTo(0, 0)
               }}

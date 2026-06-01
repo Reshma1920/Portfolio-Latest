@@ -1,9 +1,11 @@
+'use client'
+
 import { useLayoutEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { usePathname } from 'next/navigation'
 
 /** Runs before browser paint on each navigation so the window starts at the top. */
 export function ScrollToTop() {
-  const { pathname } = useLocation()
+  const pathname = usePathname()
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0)

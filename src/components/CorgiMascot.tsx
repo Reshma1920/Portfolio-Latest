@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const CORGI_SRC = '/Corgi%20SVG%20.svg'

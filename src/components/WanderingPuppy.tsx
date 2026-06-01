@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /** Corgi 1–6.svg (spaces encoded for URL) */
@@ -87,14 +89,14 @@ export function WanderingPuppy() {
   const [greetingText, setGreetingText] = useState<string | null>(null)
 
   const hoverRef = useRef(false)
-  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const idleTimerRef = useRef<number | null>(null)
   const lastHoverPhraseRef = useRef<string | null>(null)
-  const greetingTimerIdsRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const greetingTimerIdsRef = useRef<number[]>([])
   const greetingTextRef = useRef<string | null>(null)
   const clickStepRef = useRef<number | null>(null)
   const hoverRotationOrderRef = useRef<string[] | null>(null)
   const rotationIndexRef = useRef(0)
-  const idleBubbleDismissRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const idleBubbleDismissRef = useRef<number | null>(null)
   const lastIdleCorgiRef = useRef<number | null>(null)
 
   const [idleRotationText, setIdleRotationText] = useState<string | null>(null)
@@ -121,7 +123,7 @@ export function WanderingPuppy() {
 
   const armIdleTimer = useCallback(() => {
     clearIdleTimer()
-    idleTimerRef.current = setTimeout(() => {
+    idleTimerRef.current = window.setTimeout(() => {
       if (hoverRef.current) return
       setClickStep(null)
       setActiveAnim(null)
