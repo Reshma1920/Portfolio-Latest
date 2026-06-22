@@ -46,16 +46,6 @@ function CornerBrackets() {
   )
 }
 
-/** Horizontal rule spanning entire viewport width (centered under max-width layout). */
-function ViewportRule({ edge }: { edge: 'top' | 'bottom' }) {
-  return (
-    <span
-      aria-hidden
-      className={`pointer-events-none absolute left-1/2 z-[2] h-px w-screen max-w-none -translate-x-1/2 bg-[#e0e0e0] ${edge === 'top' ? 'top-0' : 'bottom-0'}`}
-    />
-  )
-}
-
 function ComingSoonMediaTag() {
   return (
     <span className="pointer-events-none absolute bottom-6 left-6 z-[5] border border-solid border-[#e0e0e0] bg-white px-3 py-1.5 font-dmSans text-[12px] font-medium leading-none tracking-wide text-[#333333] md:bottom-8 md:left-8">
@@ -174,9 +164,7 @@ function ProjectCard({
   }, [mediaVideoSrc, mediaVideoFullDuration])
 
   return (
-    <article className="relative flex w-full flex-col border-x border-solid border-[#e0e0e0] bg-white md:flex-row md:items-stretch">
-      <ViewportRule edge="top" />
-      <ViewportRule edge="bottom" />
+    <article className="relative flex w-full flex-col border border-solid border-[#e0e0e0] bg-white md:flex-row md:items-stretch">
 
       {/* Left column — text */}
       <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-[44px]">
@@ -317,7 +305,7 @@ export function WorkSection() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-[62px]">
+          <div className="flex flex-col gap-[82px]">
             <Link
               href="/okto"
               onClick={() => {
