@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '../index.css'
 import { Analytics } from '@vercel/analytics/react'
+import { PortfolioFooter } from '../components/PortfolioFooter'
 
 export const metadata: Metadata = {
   title: 'Reshma Lokanathan — Product Designer',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         {children}
+        <PortfolioFooter />
         <Analytics />
       </body>
     </html>

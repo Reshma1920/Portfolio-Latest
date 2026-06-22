@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { HeroCanvasCards } from './HeroCanvasCards'
 
 /** 6×6 tiles, flush grid (no gap between cells) */
 const CELL = 6
@@ -632,7 +631,6 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
   return (
     <div ref={wrapRef} className={`relative overflow-hidden border-0 bg-[#F7F6F2] outline-none ${className}`}>
       <canvas ref={canvasRef} className="block h-full w-full touch-none border-0 outline-none" />
-      <HeroCanvasCards containerRef={wrapRef} />
       {alt ? <span className="sr-only">{alt}</span> : null}
     </div>
   )

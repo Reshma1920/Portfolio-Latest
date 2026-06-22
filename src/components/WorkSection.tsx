@@ -307,14 +307,14 @@ export function WorkSection() {
     <section id="work" className="w-full font-dmSans">
       {/* Outer padding matches CinematicHero nav wrapper (px-3 sm:px-5); inner width matches nav bar (max-w-7xl). */}
       <div className="px-3 sm:px-5">
-        <div className="mx-auto w-full max-w-7xl pb-[80px] pt-[80px]">
-          <div className="mb-[80px] flex justify-center">
-            <div className="relative border border-solid border-[#e0e0e0] bg-white px-[64px] py-[16px]">
-              <CornerBrackets />
-              <h2 className="font-display text-center text-[40px] font-medium text-[#000000]">
-                Explore my work
-              </h2>
-            </div>
+        <div className="mx-auto w-full max-w-7xl pb-[80px] pt-0">
+          <div className="mb-[70px] flex items-baseline justify-between gap-6 px-[40px]">
+            <h2 className="font-display text-left text-[40px] font-medium text-[#000000]">
+              //Selected Work
+            </h2>
+            <p className="shrink-0 text-right font-dmSans text-[14px] font-normal leading-snug text-[#646464]">
+              Enterprise, B2B, Financial Services
+            </p>
           </div>
 
           <div className="flex flex-col gap-[62px]">

@@ -240,7 +240,8 @@ export function SiteNav({ variant }: SiteNavProps) {
         ref={navShellRef}
         className={`pointer-events-auto ${navBarSurfaceClass}`}
       >
-        <div className="mx-auto w-full max-w-7xl px-4 md:px-5">
+        <div className="px-3 sm:px-5">
+          <div className="mx-auto w-full max-w-7xl px-[40px]">
           <nav
             className="flex w-full flex-wrap items-center justify-between gap-4 py-4 md:gap-6"
             aria-label="Primary"
@@ -318,6 +319,7 @@ export function SiteNav({ variant }: SiteNavProps) {
                 AI Playground
               </a>
             </div>
+          </div>
           </div>
         </div>
         <div className="h-px w-full bg-[#e0e0e0]" aria-hidden />
