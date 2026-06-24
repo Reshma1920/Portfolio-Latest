@@ -867,6 +867,22 @@ function useCountNumber(end: number, durationMs: number, started: boolean): numb
   return started ? value : 0
 }
 
+type FinalDesignPanelConfig = {
+  id: string
+  navLabel: string
+  title: string
+  subtitle: string
+  bullets: readonly string[]
+  decision: string
+  imageLabel: string
+  imageTag?: string
+  imageSrc?: string
+  imageAlt?: string
+  imageHeight: 'auto' | number | string
+  imagePaddingClassName?: string
+  imageClassName?: string
+}
+
 const FINAL_DESIGN_PANELS = [
   {
     id: 'latch-final-screens',
@@ -950,7 +966,7 @@ const FINAL_DESIGN_PANELS = [
     imagePaddingClassName: 'p-[42px]',
     imageClassName: 'w-[85%] max-w-[85%]',
   },
-] as const
+] as const satisfies readonly FinalDesignPanelConfig[]
 
 const FINAL_DESIGN_SCROLL_OFFSET_PX = 108
 
@@ -963,7 +979,7 @@ function FinalDesignPanel({
   panel,
   panelRef,
 }: {
-  panel: (typeof FINAL_DESIGN_PANELS)[number]
+  panel: FinalDesignPanelConfig
   panelRef: (el: HTMLDivElement | null) => void
 }) {
   return (
@@ -981,7 +997,7 @@ function FinalDesignPanel({
         imageSrc={panel.imageSrc}
         imageAlt={panel.imageAlt}
         imagePaddingClassName={panel.imagePaddingClassName}
-        imageClassName={'imageClassName' in panel ? panel.imageClassName : undefined}
+        imageClassName={panel.imageClassName}
         hideCrossPattern={Boolean(panel.imageSrc)}
         className={`w-full ${panel.title ? 'mt-6' : ''}`}
       />

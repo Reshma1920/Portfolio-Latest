@@ -320,7 +320,7 @@ export function WorkSection() {
               aria-label="Open Latch case study (SuperLabs)"
             >
               <ProjectCard
-                companyName="SuperLabs Inc."
+                companyName="Latch AI"
                 logoSrc="/superlabs-logo.png"
                 projectTitle="Voice and Recording-Led Setup Flow for AI Workflow Automation"
                 description="Designing for the tension between delegation and control — where users hand off work to AI without losing transparency or trust."
