@@ -447,7 +447,7 @@ function OktoTldrSection() {
               noBorder
               hideCrossPattern
               className="absolute inset-0 h-full w-full !bg-transparent"
-              videoSrc="/Latch_Final.mov"
+              videoSrc="/okto-hero-video.mov"
               videoContainerClassName="absolute inset-0 z-[1] flex items-center justify-center p-0 [&_video]:pointer-events-auto"
               videoClassName="okto-video-controls-hover h-full w-full object-cover"
             />
