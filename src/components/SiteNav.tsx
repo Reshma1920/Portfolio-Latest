@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { scrollToSectionId } from '../utils/scroll'
+import { caseStudyContainerClass } from '../case-studies/caseStudyLayout'
 
 const RESUME_HREF = '/resume.pdf'
 
@@ -240,8 +241,8 @@ export function SiteNav({ variant }: SiteNavProps) {
         ref={navShellRef}
         className={`pointer-events-auto ${navBarSurfaceClass}`}
       >
-        <div className="px-3 sm:px-5">
-          <div className="mx-auto w-full max-w-7xl px-[40px]">
+        <div className={isCaseStudy ? '' : 'px-3 sm:px-5'}>
+          <div className={isCaseStudy ? caseStudyContainerClass : 'mx-auto w-full max-w-7xl px-[40px]'}>
           <nav
             className="flex w-full flex-wrap items-center justify-between gap-4 py-4 md:gap-6"
             aria-label="Primary"

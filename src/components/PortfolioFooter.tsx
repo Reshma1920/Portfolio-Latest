@@ -8,21 +8,10 @@ const FOOTER_SIDE_INSET_PX = 90
 export function PortfolioFooter() {
   return (
     <footer
-      className="relative z-10 w-screen max-w-none pt-[100px]"
+      className="relative z-10 w-screen max-w-none"
       style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
       aria-label="Site footer"
     >
-      <div
-        className="mb-6 flex items-baseline justify-between gap-6 font-dmSans text-[14px] font-normal text-[#646464]"
-        style={{
-          paddingLeft: `${FOOTER_SIDE_INSET_PX}px`,
-          paddingRight: `${FOOTER_SIDE_INSET_PX}px`,
-        }}
-      >
-        <p>Reshma Lokanathan • 2026</p>
-        <p className="shrink-0 text-right">Atlanta, GA</p>
-      </div>
-
       <div className="relative">
         <HeroPixelTorch
           src={HERO_IMAGE_SRC}
@@ -36,6 +25,16 @@ export function PortfolioFooter() {
         >
           Fin.
         </p>
+        <div
+          className="absolute inset-x-0 bottom-0 z-[3] flex items-baseline justify-between gap-6 pb-6 font-dmSans text-[14px] font-normal text-white"
+          style={{
+            paddingLeft: `${FOOTER_SIDE_INSET_PX}px`,
+            paddingRight: `${FOOTER_SIDE_INSET_PX}px`,
+          }}
+        >
+          <p>Reshma Lokanathan • 2026</p>
+          <p className="shrink-0 text-right">Atlanta, GA</p>
+        </div>
       </div>
     </footer>
   )

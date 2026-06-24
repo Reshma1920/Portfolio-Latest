@@ -2,6 +2,7 @@
 
 import { Helmet } from 'react-helmet-async'
 import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
+import { caseStudyContainerClass, caseStudyMainClass } from './caseStudyLayout'
 import type { RefObject } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -680,7 +681,7 @@ function FinalDesignsSection() {
 
   return (
     <section className="relative ml-[calc(50%-50vw)] w-screen max-w-[100vw] border-b border-solid border-[#e0e0e0] bg-[#050505] py-16 text-white sm:py-24">
-      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
+      <div className={caseStudyContainerClass}>
         <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
           <aside className="lg:sticky lg:top-[140px] lg:col-span-4 lg:self-start">
             <span className="inline-block border border-white/20 bg-white/[0.06] px-2.5 py-1 font-sans text-[11px] font-medium uppercase tracking-[0.14em] text-white/75 sm:text-[12px]">
@@ -770,7 +771,7 @@ export default function HDFCCaseStudy() {
       <SiteNav variant="case-study" />
       <SiteNavSpacer />
 
-      <main className="mx-auto w-full max-w-[1200px] px-4 pb-28 sm:px-6">
+      <main className={caseStudyMainClass}>
 
         {/* 01 */}
         <section className="border-y border-solid border-[#e0e0e0] py-14">
