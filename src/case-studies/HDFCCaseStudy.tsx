@@ -2,7 +2,7 @@
 
 import { Helmet } from 'react-helmet-async'
 import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
-import { caseStudyContainerClass, caseStudyMainClass } from './caseStudyLayout'
+import { caseStudyContainerClass, caseStudyMainClass, caseStudyPageOuterClass } from './caseStudyLayout'
 import type { RefObject } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -31,7 +31,7 @@ function CornerMarkersLight() {
 }
 
 function SectionDivider() {
-  return <div className="h-px w-full bg-[#e0e0e0]" aria-hidden />
+  return <div className="my-10 h-px w-full bg-[#e0e0e0]" aria-hidden />
 }
 
 /** Numbered pill + tag (Inter 12px) */
@@ -771,6 +771,7 @@ export default function HDFCCaseStudy() {
       <SiteNav variant="case-study" />
       <SiteNavSpacer />
 
+      <div className={caseStudyPageOuterClass}>
       <main className={caseStudyMainClass}>
 
         {/* 01 */}
@@ -1341,6 +1342,7 @@ export default function HDFCCaseStudy() {
           <SectionDivider />
         </section>
       </main>
+      </div>
     </div>
   )
 }

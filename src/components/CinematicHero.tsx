@@ -49,6 +49,7 @@ export function CinematicHero() {
       <HeroAmbientPixels
         topOffsetPx={NAV_SPACER_PX}
         bottomOffsetPx={HERO_LINE_BOTTOM_OFFSET_PX + 1}
+        sideInsetPx={HERO_SIDE_INSET_PX}
       />
       <HeroGuideCornerMarkers />
 

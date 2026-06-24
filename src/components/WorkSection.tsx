@@ -113,12 +113,14 @@ type ProjectCardProps = {
   mediaImageSrc?: string
   /** Base + floating cards (takes precedence over single mediaImageSrc) */
   mediaLayered?: MediaLayeredProps
-  /** Pill tags below description; defaults to global TAGS */
+  /** Pill tags above title; defaults to global TAGS */
   tags?: readonly string[]
   /** Pill at bottom-left of media area (white background) */
   comingSoon?: boolean
   /** When true, video plays from start to natural end (no HDFC-style in/out trim) */
   mediaVideoFullDuration?: boolean
+  /** Inset padding (px) around video; placeholder box size stays the same */
+  mediaVideoPaddingPx?: number
 }
 
 function ProjectCard({
@@ -133,6 +135,7 @@ function ProjectCard({
   tags = TAGS,
   comingSoon = false,
   mediaVideoFullDuration = false,
+  mediaVideoPaddingPx,
 }: ProjectCardProps = {}) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -167,7 +170,7 @@ function ProjectCard({
     <article className="relative flex w-full flex-col border border-solid border-[#e0e0e0] bg-white md:flex-row md:items-stretch">
 
       {/* Left column — text */}
-      <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-[44px]">
+      <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-0">
         <div className="-mx-[40px] border-b border-solid border-[#e0e0e0] px-[40px] py-[24px]">
           <div className="flex items-center gap-3 md:gap-4">
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-solid border-[#e0e0e0] bg-white">
@@ -187,25 +190,8 @@ function ProjectCard({
           </div>
         </div>
 
-        <div
-          className="-mx-[40px]"
-          style={{
-            paddingTop: '40px',
-            paddingBottom: '40px',
-            paddingLeft: '40px',
-            paddingRight: '40px',
-          }}
-        >
-          <h3 className="font-dmSans text-[28px] font-medium leading-snug text-[#000000]">
-            {projectTitle}
-          </h3>
-
-          <p className="mt-[10px] font-dmSans text-[14px] font-normal leading-[1.6] text-[#6F6F6F]">
-            {description}
-          </p>
-
-          {/* Pills below description */}
-          <div className="mt-[21px] flex flex-wrap items-center justify-start gap-2">
+        <div className="-mx-[40px] flex flex-1 flex-col justify-center px-[40px] py-[80px]">
+          <div className="flex flex-wrap items-center justify-start gap-2">
             {tags.map((tag) => (
               <span
                 key={tag}
@@ -216,11 +202,21 @@ function ProjectCard({
             ))}
           </div>
 
-          <ul className="mt-[68px] list-none space-y-0 font-dmSans text-[14px] font-normal leading-[2] text-[#333333]">
-            {bullets.map((line) => (
-              <li key={line}>° {line}</li>
-            ))}
-          </ul>
+          <h3 className="mt-[10px] font-dmSans text-[28px] font-medium leading-snug text-[#000000]">
+            {projectTitle}
+          </h3>
+
+          <p className="mt-[10px] font-dmSans text-[14px] font-normal leading-[1.6] text-[#6F6F6F]">
+            {description}
+          </p>
+
+          {bullets.length > 0 ? (
+            <ul className="mt-[68px] list-none space-y-0 font-dmSans text-[14px] font-normal leading-[2] text-[#333333]">
+              {bullets.map((line) => (
+                <li key={line}>° {line}</li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </div>
 
@@ -231,37 +227,46 @@ function ProjectCard({
           aria-hidden
         />
         {mediaVideoSrc ? (
-          <div className="absolute inset-0 z-[1] flex items-center justify-center p-6 md:p-8">
+          <div className="absolute inset-0 z-[1] bg-[#F6F5F3]">
             {comingSoon ? <ComingSoonMediaTag /> : null}
-            <video
-              ref={videoRef}
-              src={mediaVideoSrc}
-              className="h-auto max-h-full w-[85%] object-contain [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
-              muted
-              loop
-              playsInline
-              aria-hidden
-              onLoadedMetadata={
-                mediaVideoFullDuration
-                  ? undefined
-                  : (e) => {
-                      e.currentTarget.currentTime = VIDEO_TRIM_START_SEC
-                    }
+            <div
+              className="absolute overflow-hidden"
+              style={
+                mediaVideoPaddingPx
+                  ? { inset: `${mediaVideoPaddingPx}px` }
+                  : { inset: 0 }
               }
-              onTimeUpdate={
-                mediaVideoFullDuration
-                  ? undefined
-                  : (e) => {
-                      const v = e.currentTarget
-                      if (v.currentTime >= VIDEO_TRIM_END_SEC) {
-                        v.currentTime = VIDEO_TRIM_START_SEC
+            >
+              <video
+                ref={videoRef}
+                src={mediaVideoSrc}
+                className="block h-full w-full object-cover object-center [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
+                muted
+                loop
+                playsInline
+                aria-hidden
+                onLoadedMetadata={
+                  mediaVideoFullDuration
+                    ? undefined
+                    : (e) => {
+                        e.currentTarget.currentTime = VIDEO_TRIM_START_SEC
                       }
-                    }
-              }
-            />
+                }
+                onTimeUpdate={
+                  mediaVideoFullDuration
+                    ? undefined
+                    : (e) => {
+                        const v = e.currentTarget
+                        if (v.currentTime >= VIDEO_TRIM_END_SEC) {
+                          v.currentTime = VIDEO_TRIM_START_SEC
+                        }
+                      }
+                }
+              />
+            </div>
           </div>
         ) : mediaLayered ? (
-          <div className="absolute inset-0 z-[1] flex min-h-0 items-center justify-center overflow-hidden p-6 md:p-8">
+          <div className="absolute inset-0 z-[1] flex min-h-0 items-center justify-center overflow-hidden bg-[#F6F5F3] p-6 md:p-8">
             {comingSoon ? <ComingSoonMediaTag /> : null}
             <div className="relative flex h-full max-h-full w-full min-w-0 items-center justify-center">
               <ProjectCardLayeredMedia
@@ -273,7 +278,7 @@ function ProjectCard({
             </div>
           </div>
         ) : mediaImageSrc ? (
-          <div className="absolute inset-0 z-[1] flex items-center justify-center p-6 md:p-8">
+          <div className="absolute inset-0 z-[1] flex items-center justify-center bg-[#F6F5F3] p-6 md:p-8">
             {comingSoon ? <ComingSoonMediaTag /> : null}
             <img
               src={mediaImageSrc}
@@ -305,30 +310,28 @@ export function WorkSection() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-[82px]">
+          <div className="flex flex-col gap-[142px]">
             <Link
-              href="/okto"
+              href="/latch"
               onClick={() => {
                 window.scrollTo(0, 0)
               }}
               className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
-              aria-label="Open Okto case study (SuperLabs)"
+              aria-label="Open Latch case study (SuperLabs)"
             >
               <ProjectCard
                 companyName="SuperLabs Inc."
                 logoSrc="/superlabs-logo.png"
                 projectTitle="Voice and Recording-Led Setup Flow for AI Workflow Automation"
                 description="Designing for the tension between delegation and control — where users hand off work to AI without losing transparency or trust."
-                bullets={[
-                  'Contributed to defining the product direction and core product surfaces for the pre-seed AI startup.',
-                ]}
+                bullets={[]}
                 tags={[
                   'Enterprise UX',
                   'B2B',
                   'Workflow Automation',
                   'Privacy & Trust',
                 ]}
-                mediaVideoSrc="/superlabs-hero-video.mov"
+                mediaVideoSrc="/Latch_Final.mov"
                 mediaVideoFullDuration
               />
             </Link>
@@ -345,10 +348,9 @@ export function WorkSection() {
                 logoSrc="/hdfc-bank-logo.png"
                 projectTitle="Enterprise Loan Management Platform for India's Largest Private Bank"
                 description="End-to-end B2B platform enabling real estate developers to manage construction-linked loan disbursements, track project progress, and eliminate dependency on bank agents — built for scale across 500K+ users."
-                bullets={[
-                  'Designed a unified loan management ecosystem improving sensing time by 68%, 500k+ adoption in 1 year.',
-                ]}
+                bullets={[]}
                 mediaVideoSrc="/HDFC%20Video%20.mp4"
+                mediaVideoPaddingPx={30}
               />
             </Link>
             <ProjectCard

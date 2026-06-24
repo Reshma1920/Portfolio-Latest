@@ -27,16 +27,16 @@
   }
 }
 
-/* Okto hero video: hide native control chrome until hover (WebKit/Blink). Firefox shows controls normally. */
+/* Latch hero video: hide native control chrome until hover (WebKit/Blink). Firefox shows controls normally. */
 @media (hover: hover) and (pointer: fine) {
-  video.okto-video-controls-hover::-webkit-media-controls-panel,
-  video.okto-video-controls-hover::-webkit-media-controls-enclosure {
+  video.latch-video-controls-hover::-webkit-media-controls-panel,
+  video.latch-video-controls-hover::-webkit-media-controls-enclosure {
     opacity: 0;
     transition: opacity 0.22s ease;
   }
 
-  video.okto-video-controls-hover:hover::-webkit-media-controls-panel,
-  video.okto-video-controls-hover:hover::-webkit-media-controls-enclosure {
+  video.latch-video-controls-hover:hover::-webkit-media-controls-panel,
+  video.latch-video-controls-hover:hover::-webkit-media-controls-enclosure {
     opacity: 1;
   }
 }
