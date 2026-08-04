@@ -1,11 +1,14 @@
 'use client'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { scrollToSectionId } from '../utils/scroll'
-import { caseStudyContainerClass, PAGE_HORIZONTAL_OUTER_CLASS } from '../case-studies/caseStudyLayout'
+import {
+  HOME_GUIDE_MARKER_PX,
+  HOME_GUIDE_SIDE_INSET_PX,
+} from '../case-studies/caseStudyLayout'
 
 const RESUME_HREF = '/resume.pdf'
 
@@ -31,6 +34,25 @@ function HamburgerIcon() {
       <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
+  )
+}
+
+function NavActiveMark() {
+  return (
+    <span
+      className="inline-block shrink-0 bg-black"
+      style={{ width: HOME_GUIDE_MARKER_PX, height: HOME_GUIDE_MARKER_PX }}
+      aria-hidden
+    />
+  )
+}
+
+function NavItemLabel({ active, children }: { active: boolean; children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      {active ? <NavActiveMark /> : null}
+      {children}
+    </span>
   )
 }
 
@@ -166,7 +188,7 @@ export function SiteNav({ variant }: SiteNavProps) {
       className={homeActive ? navLinkActiveClass : navLinkClass}
       onClick={closeMobileMenu}
     >
-      Home
+      <NavItemLabel active={homeActive}>Home</NavItemLabel>
     </Link>
   ) : (
     <a
@@ -175,7 +197,7 @@ export function SiteNav({ variant }: SiteNavProps) {
       className={homeActive ? navLinkActiveClass : navLinkClass}
       onClick={onHomeAnchor}
     >
-      Home
+      <NavItemLabel active={homeActive}>Home</NavItemLabel>
     </a>
   )
 
@@ -186,7 +208,7 @@ export function SiteNav({ variant }: SiteNavProps) {
       className={workActive ? navLinkActiveClass : navLinkClass}
       onClick={closeMobileMenu}
     >
-      Work
+      <NavItemLabel active={workActive}>Work</NavItemLabel>
     </Link>
   ) : (
     <a
@@ -195,133 +217,143 @@ export function SiteNav({ variant }: SiteNavProps) {
       className={workActive ? navLinkActiveClass : navLinkClass}
       onClick={onWorkAnchor}
     >
-      Work
+      <NavItemLabel active={workActive}>Work</NavItemLabel>
     </a>
   )
 
   const mobileHomeLink = isCaseStudy ? (
     <Link
       href="/"
-      className={`block py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
+      className={`inline-flex py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
       onClick={closeMobileMenu}
     >
-      Home
+      <NavItemLabel active={homeActive}>Home</NavItemLabel>
     </Link>
   ) : (
     <a
       href="#home"
-      className={`block py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
+      className={`inline-flex py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
       onClick={onHomeAnchor}
     >
-      Home
+      <NavItemLabel active={homeActive}>Home</NavItemLabel>
     </a>
   )
 
   const mobileWorkLink = isCaseStudy ? (
     <Link
       href="/#work"
-      className={`block py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
+      className={`inline-flex py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
       onClick={closeMobileMenu}
     >
-      Work
+      <NavItemLabel active={workActive}>Work</NavItemLabel>
     </Link>
   ) : (
     <a
       href="#work"
-      className={`block py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
+      className={`inline-flex py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
       onClick={onWorkAnchor}
     >
-      Work
+      <NavItemLabel active={workActive}>Work</NavItemLabel>
     </a>
   )
 
+  const navRow = (
+    <>
+      <nav
+        className="flex w-full flex-wrap items-center justify-between gap-4 py-4 md:gap-6"
+        aria-label="Primary"
+      >
+        {nameLink}
+
+        <div className="hidden max-w-full flex-1 flex-wrap items-center justify-end gap-x-8 gap-y-2 md:flex md:flex-initial md:justify-end">
+          {homeLink}
+          {workLink}
+          <a
+            href="https://www.linkedin.com/in/reshma-lokanathan19/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={navLinkClass}
+          >
+            LinkedIn
+          </a>
+          <a
+            href="https://reshma-lok.framer.website/ai-playground"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={navLinkClass}
+          >
+            AI Playground
+          </a>
+        </div>
+
+        <button
+          type="button"
+          className="flex p-1 md:hidden"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="primary-mobile-nav"
+          onClick={() => setMobileMenuOpen((o) => !o)}
+        >
+          <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
+          <HamburgerIcon />
+        </button>
+      </nav>
+
+      <div
+        id="primary-mobile-nav"
+        aria-hidden={!mobileMenuOpen}
+        className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${
+          mobileMenuOpen ? 'max-h-[min(80vh,560px)]' : 'pointer-events-none max-h-0'
+        }`}
+      >
+        <div className="border-t border-black/10 pb-4 pt-2">
+          {mobileHomeLink}
+          {mobileWorkLink}
+          <a
+            href={RESUME_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`block py-3 font-sans ${navLinkClass}`}
+            onClick={closeMobileMenu}
+          >
+            Resume
+          </a>
+          <a
+            href="https://www.linkedin.com/in/reshma-lokanathan19/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`block py-3 font-sans ${navLinkClass}`}
+            onClick={closeMobileMenu}
+          >
+            LinkedIn
+          </a>
+          <a
+            href="https://reshma-lok.framer.website/ai-playground"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`block py-3 font-sans ${navLinkClass}`}
+            onClick={closeMobileMenu}
+          >
+            AI Playground
+          </a>
+        </div>
+      </div>
+    </>
+  )
+
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60]">
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-[80]">
       <div
         ref={navShellRef}
         className={`pointer-events-auto ${navBarSurfaceClass}`}
       >
-        <div className={PAGE_HORIZONTAL_OUTER_CLASS}>
-          <div className={caseStudyContainerClass}>
-          <nav
-            className="flex w-full flex-wrap items-center justify-between gap-4 py-4 md:gap-6"
-            aria-label="Primary"
-          >
-            {nameLink}
-
-            <div className="hidden max-w-full flex-1 flex-wrap items-center justify-end gap-x-8 gap-y-2 md:flex md:flex-initial md:justify-end">
-              {homeLink}
-              {workLink}
-              <a
-                href="https://www.linkedin.com/in/reshma-lokanathan19/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={navLinkClass}
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://reshma-lok.framer.website/ai-playground"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={navLinkClass}
-              >
-                AI Playground
-              </a>
-            </div>
-
-            <button
-              type="button"
-              className="flex p-1 md:hidden"
-              aria-expanded={mobileMenuOpen}
-              aria-controls="primary-mobile-nav"
-              onClick={() => setMobileMenuOpen((o) => !o)}
-            >
-              <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
-              <HamburgerIcon />
-            </button>
-          </nav>
-
-          <div
-            id="primary-mobile-nav"
-            aria-hidden={!mobileMenuOpen}
-            className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${
-              mobileMenuOpen ? 'max-h-[min(80vh,560px)]' : 'pointer-events-none max-h-0'
-            }`}
-          >
-            <div className="border-t border-black/10 pb-4 pt-2">
-              {mobileHomeLink}
-              {mobileWorkLink}
-              <a
-                href={RESUME_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block py-3 font-sans ${navLinkClass}`}
-                onClick={closeMobileMenu}
-              >
-                Resume
-              </a>
-              <a
-                href="https://www.linkedin.com/in/reshma-lokanathan19/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block py-3 font-sans ${navLinkClass}`}
-                onClick={closeMobileMenu}
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://reshma-lok.framer.website/ai-playground"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block py-3 font-sans ${navLinkClass}`}
-                onClick={closeMobileMenu}
-              >
-                AI Playground
-              </a>
-            </div>
-          </div>
-          </div>
+        <div
+          style={{
+            // Match home: 40px breathing room inside the 90px guide verticals
+            paddingLeft: HOME_GUIDE_SIDE_INSET_PX + 40,
+            paddingRight: HOME_GUIDE_SIDE_INSET_PX + 40,
+          }}
+        >
+          {navRow}
         </div>
         <div className="h-px w-full bg-[#e0e0e0]" aria-hidden />
       </div>

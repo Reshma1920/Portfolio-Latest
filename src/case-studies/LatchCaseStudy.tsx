@@ -2,7 +2,8 @@
 
 import { Helmet } from 'react-helmet-async'
 import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
-import { caseStudyContainerClass, caseStudyMainClass, caseStudyPageOuterClass } from './caseStudyLayout'
+import { CaseStudyGuideBreakOverlay, CaseStudyPageDotGutters, CaseStudyPageVerticals, CaseStudySectionFrame, CaseStudySectionGap } from './CaseStudySectionFrame'
+import { caseStudyContainerClass, caseStudyMainClass, caseStudyPageOuterClass, HOME_GUIDE_MARKER_PX, HOME_GUIDE_SIDE_INSET_PX } from './caseStudyLayout'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -28,10 +29,6 @@ function CornerMarkers() {
       />
     </>
   )
-}
-
-function SectionDivider() {
-  return <div className="my-10 h-px w-full bg-[#e0e0e0]" aria-hidden />
 }
 
 /** Numbered pill + tag */
@@ -130,7 +127,7 @@ function ImagePlaceholder({
 }) {
   const h = typeof height === 'number' ? `${height}px` : height
   const w = typeof width === 'number' ? `${width}px` : width
-  const borderClass = noBorder ? 'border-0' : 'border border-solid border-[#e0e0e0]'
+  const borderClass = noBorder ? 'border-0' : 'border border-dotted border-[#b0b0a8]'
   const minH =
     typeof height === 'number' || (typeof height === 'string' && !height.endsWith('%'))
       ? h
@@ -342,10 +339,10 @@ const RESEARCH_OVERVIEW_COLUMNS: ResearchOverviewColumn[] = [
 
 function LatchResearchOverviewSection() {
   return (
-    <section className="py-14">
+    <section className="px-6 pb-6 pt-14 sm:px-8">
       <SectionPill>02 • Research Overview</SectionPill>
 
-      <div className="mt-10 grid grid-cols-1 divide-y divide-[#e0e0e0] border border-solid border-[#e0e0e0] bg-white md:grid-cols-3 md:grid-rows-[repeat(6,auto)] md:divide-x md:divide-y-0">
+      <div className="mt-10 grid grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border border-dotted border-[#b0b0a8] bg-white md:grid-cols-3 md:grid-rows-[repeat(6,auto)] md:divide-x md:divide-y-0">
         {RESEARCH_OVERVIEW_COLUMNS.map((column) => (
           <article
             key={column.number}
@@ -408,79 +405,75 @@ function LatchResearchOverviewSection() {
 }
 
 function LatchTldrSection() {
-  const challengeCard = {
-    title: 'Challenge',
-    intro:
-      'Teaching a non-technical user to articulate their own processes clearly for a machine to understand them.',
-    scopeItems: [
-      'design the UI for the first-time recording experience',
-      'develop principles to shape voice-based interactions between user and agent.',
-    ],
-  }
+  const challengeIntro =
+    'Teaching a non-technical user to articulate their own processes clearly for a machine to understand them.'
 
-  const bottomCards = [
-    {
-      title: 'What we did',
-      body:
-        '6 user interviews across construction, CPG, and consulting. Competitive analysis of 10 tools across 4 categories. Two prototypes at opposite ends of a spectrum — one ambient and minimal, one Zoom-like and explicit — tested with real users and merged into a single final direction.',
-    },
-    {
-      title: 'What we found',
-      body:
-        "Users don't choose between control and simplicity. They want simplicity during recording and control at review. The biggest blocker is the inability to capture enough context to build it reliably.",
-    },
-  ] as const
+  const scopeItems = [
+    'design the UI for the first-time recording experience',
+    'develop principles to shape voice-based interactions between user and agent.',
+  ]
+
+  const foundBody =
+    'Users want simplicity during recording and control at review. The biggest blocker is the inability to capture enough context to build it reliably.'
 
   const cardPaddingClass = 'px-6 py-6 sm:px-7 sm:py-7'
 
   return (
-    <section className="py-14">
+    <section className="px-6 py-14 sm:px-8">
       <h2 className={sectionTitleClass}>TL;DR</h2>
 
-      <div className="relative mt-6 border border-solid border-[#e0e0e0] bg-[#fdfcfa]">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,65%)_minmax(0,35%)]">
-          <div className="relative min-w-0 aspect-video border-b border-solid border-[#e0e0e0] lg:border-r lg:border-[#e0e0e0]">
-            <ImagePlaceholder
-              width="100%"
-              height="100%"
-              fillHeight
-              noBorder
-              hideCrossPattern
-              className="absolute inset-0 h-full w-full !bg-transparent"
-              videoSrc="/Latch_Final.mov"
-              videoContainerClassName="absolute inset-0 z-[1] flex items-center justify-center p-0 [&_video]:pointer-events-auto"
-              videoClassName="latch-video-controls-hover h-full w-full object-cover"
-            />
-          </div>
+      <div className="relative mt-6 border border-dotted border-[#b0b0a8] bg-[#fdfcfa]">
+        {/* Top: full-width video */}
+        <div className="relative min-w-0 aspect-video w-full border-b border-dotted border-[#b0b0a8]">
+          <ImagePlaceholder
+            width="100%"
+            height="100%"
+            fillHeight
+            noBorder
+            hideCrossPattern
+            className="absolute inset-0 h-full w-full !bg-transparent"
+            videoSrc="/Latch_Final.mov"
+            videoContainerClassName="absolute inset-0 z-[1] flex items-center justify-center p-0 [&_video]:pointer-events-auto"
+            videoClassName="latch-video-controls-hover h-full w-full object-cover"
+          />
+        </div>
 
-          <article className={`min-w-0 border-b border-solid border-[#e0e0e0] ${cardPaddingClass}`}>
-            <p className="m-0 font-sans text-[18px] text-black">{challengeCard.title}</p>
-            <p className={`mb-0 mt-3 ${bodyClass}`}>
-              {challengeCard.intro}
-              <br />
-              <br />
-              The scope:
-              <br />
-              {challengeCard.scopeItems.map((item, index) => (
+        {/* Bottom: Challenge | Scope | What we found */}
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          <article
+            className={`min-w-0 border-b border-dotted border-[#b0b0a8] md:border-b-0 md:border-r md:border-dotted md:border-[#b0b0a8] ${cardPaddingClass}`}
+          >
+            <p className={`m-0 ${researchOverviewFieldLabelClass}`}>Challenge</p>
+            <p className="m-0 mt-2 font-dmSans text-[13px] leading-[1.65] text-[#333]">
+              {challengeIntro}
+            </p>
+          </article>
+
+          <article
+            className={`min-w-0 border-b border-dotted border-[#b0b0a8] md:border-b-0 md:border-r md:border-dotted md:border-[#b0b0a8] ${cardPaddingClass}`}
+          >
+            <p className={`m-0 ${researchOverviewFieldLabelClass}`}>The scope</p>
+            <p className="m-0 mt-2 font-dmSans text-[13px] leading-[1.65] text-[#333]">
+              {scopeItems.map((item, index) => (
                 <Fragment key={item}>
                   ({index + 1}) {item}
-                  {index < challengeCard.scopeItems.length - 1 ? <br /> : null}
+                  {index < scopeItems.length - 1 ? (
+                    <>
+                      <br />
+                      <br />
+                    </>
+                  ) : null}
                 </Fragment>
               ))}
             </p>
           </article>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2">
-          {bottomCards.map((card, index) => (
-            <article
-              key={card.title}
-              className={`${cardPaddingClass} ${index === 0 ? 'border-b border-solid border-[#e0e0e0] lg:border-b-0 lg:border-r lg:border-[#e0e0e0]' : ''}`}
-            >
-              <p className="m-0 font-sans text-[18px] text-black">{card.title}</p>
-              <p className={`mb-0 mt-3 ${bodyClass}`}>{card.body}</p>
-            </article>
-          ))}
+          <article className={`min-w-0 ${cardPaddingClass}`}>
+            <p className={`m-0 ${researchOverviewFieldLabelClass}`}>What we found</p>
+            <p className="m-0 mt-2 font-dmSans text-[13px] leading-[1.65] text-[#333]">
+              {foundBody}
+            </p>
+          </article>
         </div>
       </div>
     </section>
@@ -491,15 +484,15 @@ function CaseStudyAccordionItem({ title, children }: { title: string; children: 
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="border-b border-solid border-[#e0e0e0] last:border-b-0">
+    <div className="border-b border-dotted border-[#b0b0a8] last:border-b-0">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className={`group flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors sm:px-7 ${
+        className={`group flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors sm:px-7 sm:py-6 ${
           open
-            ? 'bg-[rgba(107,53,184,0.1)]'
-            : 'bg-white hover:bg-[rgba(107,53,184,0.1)]'
+            ? 'bg-[rgba(107,53,184,0.08)]'
+            : 'bg-transparent hover:bg-[rgba(107,53,184,0.05)]'
         }`}
       >
         <span
@@ -519,7 +512,7 @@ function CaseStudyAccordionItem({ title, children }: { title: string; children: 
         </span>
       </button>
       {open ? (
-        <div className="border-t border-solid border-[#e0e0e0] bg-[#fdfcfa] px-6 py-8 sm:px-7 sm:py-9">
+        <div className="border-t border-dotted border-[#b0b0a8] bg-[rgba(253,252,250,0.65)] px-6 py-8 sm:px-7 sm:py-9">
           {children}
         </div>
       ) : null}
@@ -541,7 +534,7 @@ function LatchUserResearchPanelContent({
         broke last week.
       </h2>
 
-      <div className="mt-12 grid grid-cols-1 divide-y divide-[#e0e0e0] border border-solid border-[#e0e0e0] bg-white md:grid-cols-3 md:divide-x md:divide-y-0">
+      <div className="mt-12 grid grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border border-dotted border-[#b0b0a8] bg-white md:grid-cols-3 md:divide-x md:divide-y-0">
         <div className="flex flex-col items-center px-6 py-10 text-center">
           <span className="font-sans text-[18px] text-black">User interviews</span>
           <p className="mt-3 mb-0 font-dmSans text-[36px] font-bold tabular-nums leading-none text-black">
@@ -565,9 +558,9 @@ function LatchUserResearchPanelContent({
         </div>
       </div>
 
-      <div className="mt-10 overflow-hidden border border-solid border-[#e0e0e0] bg-white lg:mt-12">
+      <div className="mt-10 overflow-hidden border border-dotted border-[#b0b0a8] bg-white lg:mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:items-stretch">
-          <div className="flex min-h-[380px] min-w-0 flex-col border-b border-solid border-[#e0e0e0] lg:h-full lg:min-h-0 lg:border-b-0 lg:border-r lg:border-[#e0e0e0]">
+          <div className="flex min-h-[380px] min-w-0 flex-col border-b border-dotted border-[#b0b0a8] lg:h-full lg:min-h-0 lg:border-b-0 lg:border-r lg:border-dotted lg:border-[#b0b0a8]">
             <ImagePlaceholder
               width="100%"
               height={380}
@@ -609,14 +602,14 @@ function LatchUserResearchPanelContent({
               ] as const
             ).map((row, rowIdx) => (
               <Fragment key={`theme-row-${rowIdx}`}>
-                {rowIdx > 0 ? <div className="h-px w-full shrink-0 bg-[#e0e0e0]" aria-hidden /> : null}
+                {rowIdx > 0 ? <div className="w-full shrink-0 border-t border-dotted border-[#b0b0a8]" aria-hidden /> : null}
                 <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
                   {row.map((card, ci) => {
                     const themeNum = rowIdx * 2 + ci + 1
                     return (
                       <article
                         key={card.title}
-                        className={`flex flex-col border-solid border-[#e0e0e0] px-7 py-8 ${ci === 1 ? 'border-t md:border-t-0 md:border-l' : ''}`}
+                        className={`flex flex-col border-dotted border-[#b0b0a8] px-7 py-8 ${ci === 1 ? 'border-t md:border-t-0 md:border-l' : ''}`}
                       >
                         <span className="inline-flex items-center justify-center self-start rounded-md bg-[rgba(107,53,184,0.12)] px-2.5 py-2 font-sans text-[13px] font-semibold tabular-nums tracking-tight text-[#4f2d8a]">
                           Theme {String(themeNum).padStart(2, '0')}
@@ -656,9 +649,9 @@ function LatchCompetitiveAnalysisPanelContent() {
         lives inside a single vendor versus orchestration across tools. The crowded quadrant was “enterprise IT
         installs this for you”—thin air for the admin lead wiring fourteen SaaS apps.
       </p>
-      <div className="mt-10 overflow-hidden border border-solid border-[#e0e0e0] bg-white">
+      <div className="mt-10 overflow-hidden border border-dotted border-[#b0b0a8] bg-white">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:items-stretch">
-          <div className="flex min-h-[520px] min-w-0 flex-col border-b border-solid border-[#e0e0e0] lg:h-full lg:min-h-0 lg:border-b-0 lg:border-r lg:border-[#e0e0e0]">
+          <div className="flex min-h-[520px] min-w-0 flex-col border-b border-dotted border-[#b0b0a8] lg:h-full lg:min-h-0 lg:border-b-0 lg:border-r lg:border-dotted lg:border-[#b0b0a8]">
             <ImagePlaceholder
               width="100%"
               height={520}
@@ -702,7 +695,7 @@ function LatchCompetitiveAnalysisPanelContent() {
               </div>
             </ImagePlaceholder>
           </div>
-          <div className="flex min-h-0 flex-col divide-y divide-[#e0e0e0] bg-[#fdfcfa] lg:h-full">
+          <div className="flex min-h-0 flex-col divide-y divide-dotted divide-[#b0b0a8] bg-[#fdfcfa] lg:h-full">
             {(
               [
                 'Technical complexity remains a barrier. Competitors still require dedicated technical teams. Intuitive, conversational approaches consistently stand out as the differentiator.',
@@ -736,8 +729,8 @@ function LatchUserJourneyPanelContent() {
         disconnected features.
       </p>
 
-      <div className="mt-10 grid grid-cols-1 overflow-hidden border border-solid border-[#e0e0e0] bg-white lg:grid-cols-[minmax(0,30%)_minmax(0,70%)] lg:items-stretch">
-        <div className="divide-y divide-[#e0e0e0]">
+      <div className="mt-10 grid grid-cols-1 overflow-hidden border border-dotted border-[#b0b0a8] bg-white lg:grid-cols-[minmax(0,30%)_minmax(0,70%)] lg:items-stretch">
+        <div className="divide-y divide-dotted divide-[#b0b0a8]">
           {(
             [
               {
@@ -763,7 +756,7 @@ function LatchUserJourneyPanelContent() {
             </article>
           ))}
         </div>
-        <div className="flex h-full min-h-[460px] min-w-0 flex-col border-t border-solid border-[#e0e0e0] lg:min-h-0 lg:border-t-0 lg:border-l lg:border-[#e0e0e0]">
+        <div className="flex h-full min-h-[460px] min-w-0 flex-col border-t border-dotted border-[#b0b0a8] lg:min-h-0 lg:border-t-0 lg:border-l lg:border-dotted lg:border-[#b0b0a8]">
           <ImagePlaceholder
             width="100%"
             height={460}
@@ -801,10 +794,10 @@ function LatchInDepthSection({
   statManual: number
 }) {
   return (
-    <section className="pt-[26px] pb-14">
+    <section className="px-6 pb-14 pt-8 sm:px-8">
       <p className="m-0 font-dmSans text-[13px] font-semibold uppercase tracking-wide text-[#555]">In Depth</p>
 
-      <div className="mt-4 overflow-hidden border border-solid border-[#e0e0e0] bg-white">
+      <div className="mt-4 border border-dotted border-[#b0b0a8] bg-transparent">
         <CaseStudyAccordionItem title="2.1. User Research">
           <LatchUserResearchPanelContent statInterviews={statInterviews} statManual={statManual} />
         </CaseStudyAccordionItem>
@@ -968,26 +961,72 @@ const FINAL_DESIGN_PANELS = [
   },
 ] as const satisfies readonly FinalDesignPanelConfig[]
 
-const FINAL_DESIGN_SCROLL_OFFSET_PX = 108
+const FINAL_DESIGN_SCROLL_OFFSET_PX = 120
+const FINAL_DESIGN_STICKY_TOP_PX = 120
+const FINAL_DESIGN_CORNER_PX = HOME_GUIDE_MARKER_PX
 
 const finalDesignStepTitleClass =
   'font-dmSans text-[18px] font-semibold text-white sm:text-[20px]'
 const finalDesignBodyClass = 'font-dmSans text-sm leading-[1.7] text-white/70'
 const finalDesignDecisionClass = 'font-dmSans text-sm leading-[1.7] text-white/60'
 
+/** Solid squares at the four corners of a dark step frame. */
+function FinalDesignCornerSquares() {
+  const half = FINAL_DESIGN_CORNER_PX / 2
+  const mark = '#ffffff'
+  const baseStyle = {
+    width: FINAL_DESIGN_CORNER_PX,
+    height: FINAL_DESIGN_CORNER_PX,
+    backgroundColor: mark,
+  } as const
+
+  return (
+    <>
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, left: 0, top: 0, marginLeft: -half, marginTop: -half }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, right: 0, top: 0, marginRight: -half, marginTop: -half }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, left: 0, bottom: 0, marginLeft: -half, marginBottom: -half }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, right: 0, bottom: 0, marginRight: -half, marginBottom: -half }}
+        aria-hidden
+      />
+    </>
+  )
+}
+
 function FinalDesignPanel({
   panel,
+  index,
   panelRef,
 }: {
   panel: FinalDesignPanelConfig
+  index: number
   panelRef: (el: HTMLDivElement | null) => void
 }) {
   return (
     <div
       id={panel.id}
       ref={panelRef}
-      className="scroll-mt-[100px] md:scroll-mt-[108px]"
+      className="relative scroll-mt-[100px] border border-solid border-white/25 bg-[#050505] p-6 sm:p-8 md:scroll-mt-[120px] lg:sticky lg:mb-8 lg:scroll-mt-[120px]"
+      style={{
+        top: FINAL_DESIGN_STICKY_TOP_PX,
+        zIndex: index + 1,
+      }}
     >
+      <FinalDesignCornerSquares />
+
       {panel.title ? <h3 className={`m-0 ${finalDesignStepTitleClass}`}>{panel.title}</h3> : null}
 
       <ImagePlaceholder
@@ -1021,7 +1060,10 @@ function FinalDesignPanel({
 
 function LatchFinalDesignsSection() {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
+  const navItemRefs = useRef<(HTMLAnchorElement | null)[]>([])
+  const navRef = useRef<HTMLElement | null>(null)
   const [activeIdx, setActiveIdx] = useState(0)
+  const [indicator, setIndicator] = useState({ top: 0, height: 0 })
 
   const scrollToPanel = useCallback((i: number) => {
     const panel = FINAL_DESIGN_PANELS[i]
@@ -1046,35 +1088,47 @@ function LatchFinalDesignsSection() {
     requestAnimationFrame(() => scrollToPanel(idx))
   }, [scrollToPanel])
 
-  useLayoutEffect(() => {
-    const nodes = FINAL_DESIGN_PANELS.map((panel) => document.getElementById(panel.id)).filter(
-      (node): node is HTMLDivElement => Boolean(node),
-    )
-    if (nodes.length === 0) return
+  // Sticky-stack aware scroll spy: highest index whose top has reached the stick line.
+  useEffect(() => {
+    const updateActive = () => {
+      const nodes = sectionRefs.current.filter(Boolean) as HTMLDivElement[]
+      if (nodes.length === 0) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting && e.intersectionRatio > 0)
-        if (visible.length === 0) return
-        const top = visible.reduce((a, b) => (a.intersectionRatio >= b.intersectionRatio ? a : b))
-        const idx = FINAL_DESIGN_PANELS.findIndex((panel) => panel.id === top.target.id)
-        if (idx >= 0) setActiveIdx(idx)
-      },
-      {
-        root: null,
-        rootMargin: `-${FINAL_DESIGN_SCROLL_OFFSET_PX}px 0px -38% 0px`,
-        threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.65, 0.8, 1],
-      },
-    )
+      let next = 0
+      for (let i = 0; i < nodes.length; i += 1) {
+        const top = nodes[i].getBoundingClientRect().top
+        if (top <= FINAL_DESIGN_STICKY_TOP_PX + 24) next = i
+      }
+      setActiveIdx((prev) => (prev === next ? prev : next))
+    }
 
-    nodes.forEach((node) => observer.observe(node))
-    return () => observer.disconnect()
+    updateActive()
+    window.addEventListener('scroll', updateActive, { passive: true })
+    window.addEventListener('resize', updateActive)
+    return () => {
+      window.removeEventListener('scroll', updateActive)
+      window.removeEventListener('resize', updateActive)
+    }
   }, [])
 
+  useLayoutEffect(() => {
+    const updateIndicator = () => {
+      const item = navItemRefs.current[activeIdx]
+      if (!item || !navRef.current) return
+      setIndicator({ top: item.offsetTop, height: item.offsetHeight })
+    }
+    updateIndicator()
+    window.addEventListener('resize', updateIndicator)
+    return () => window.removeEventListener('resize', updateIndicator)
+  }, [activeIdx])
+
   return (
-    <section className="relative mt-20 ml-[calc(50%-50vw)] w-screen max-w-[100vw] border-b border-solid border-[#e0e0e0] bg-[#050505] py-16 text-white sm:py-24">
+    <section
+      data-break-page-verticals=""
+      className="relative z-[2] ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-[#050505] py-16 text-white sm:py-24"
+    >
       <div className={caseStudyContainerClass}>
-        <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
+        <div className="grid gap-14 p-8 sm:p-10 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
           <aside className="lg:sticky lg:top-[140px] lg:col-span-4 lg:self-start">
             <span className="inline-block border border-white/20 bg-white/[0.06] px-2.5 py-1 font-sans text-[11px] font-medium uppercase tracking-[0.14em] text-white/75 sm:text-[12px]">
               06 • FINAL DESIGNS
@@ -1085,20 +1139,33 @@ function LatchFinalDesignsSection() {
             <p className="mt-5 max-w-[340px] font-dmSans text-[16px] font-normal leading-relaxed text-white/50 sm:text-[17px]">
               A recording experience that stays out of way but never out of sight.
             </p>
-            <nav className="mt-10 flex flex-col gap-0.5" aria-label="Jump to final design">
+            <nav
+              ref={navRef}
+              className="relative mt-10 flex flex-col gap-0.5"
+              aria-label="Jump to final design"
+            >
+              <span
+                className="pointer-events-none absolute left-0 w-0.5 bg-white transition-[transform,height] duration-300 ease-out"
+                style={{
+                  height: indicator.height || 0,
+                  transform: `translateY(${indicator.top}px)`,
+                }}
+                aria-hidden
+              />
               {FINAL_DESIGN_PANELS.map((block, i) => (
                 <a
                   key={block.id}
+                  ref={(el) => {
+                    navItemRefs.current[i] = el
+                  }}
                   href={`#${block.id}`}
                   aria-current={activeIdx === i ? 'true' : undefined}
                   onClick={(e) => {
                     e.preventDefault()
                     scrollToPanel(i)
                   }}
-                  className={`border-l-2 py-2.5 pl-4 text-left font-dmSans text-[15px] font-medium transition-colors sm:text-[16px] ${
-                    activeIdx === i
-                      ? 'border-white text-white'
-                      : 'border-transparent text-white/45 hover:text-white/75'
+                  className={`border-l-2 border-transparent py-2.5 pl-4 text-left font-dmSans text-[15px] font-medium transition-colors sm:text-[16px] ${
+                    activeIdx === i ? 'text-white' : 'text-white/45 hover:text-white/75'
                   }`}
                 >
                   {block.navLabel}
@@ -1107,31 +1174,17 @@ function LatchFinalDesignsSection() {
             </nav>
           </aside>
 
-          <div className="flex flex-col gap-14 sm:gap-16 md:gap-20 lg:col-span-8 lg:pt-[52px]">
-            <FinalDesignPanel
-              panel={FINAL_DESIGN_PANELS[0]}
-              panelRef={(el) => {
-                sectionRefs.current[0] = el
-              }}
-            />
-            <FinalDesignPanel
-              panel={FINAL_DESIGN_PANELS[1]}
-              panelRef={(el) => {
-                sectionRefs.current[1] = el
-              }}
-            />
-            <FinalDesignPanel
-              panel={FINAL_DESIGN_PANELS[2]}
-              panelRef={(el) => {
-                sectionRefs.current[2] = el
-              }}
-            />
-            <FinalDesignPanel
-              panel={FINAL_DESIGN_PANELS[3]}
-              panelRef={(el) => {
-                sectionRefs.current[3] = el
-              }}
-            />
+          <div className="relative flex flex-col gap-8 lg:col-span-8 lg:gap-0 lg:pt-[52px]">
+            {FINAL_DESIGN_PANELS.map((panel, i) => (
+              <FinalDesignPanel
+                key={panel.id}
+                panel={panel}
+                index={i}
+                panelRef={(el) => {
+                  sectionRefs.current[i] = el
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -1457,7 +1510,7 @@ export default function LatchCaseStudy() {
   const statManual = useCountNumber(47, 1400, statsStarted)
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#F7F6F2] text-foreground antialiased">
+    <div className="relative min-h-screen overflow-x-clip bg-[#F7F6F2] text-foreground antialiased">
       <Helmet>
         <title>Latch — Superlabs | UX Case Study (In Progress) | Reshma Lokanathan</title>
         <meta name="description" content={latchDescription} />
@@ -1467,39 +1520,50 @@ export default function LatchCaseStudy() {
         <meta property="og:type" content="website" />
       </Helmet>
       <SiteNav variant="case-study" />
+      <CaseStudyPageDotGutters />
+      <CaseStudyPageVerticals />
+      <CaseStudyGuideBreakOverlay />
       <SiteNavSpacer />
 
       <div className={caseStudyPageOuterClass}>
-      <main className={caseStudyMainClass}>
+        <main className={`${caseStudyMainClass} flex flex-col`}>
         {/* Hero */}
-        <section className="border-t border-solid border-[#e0e0e0] py-14">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start lg:gap-10">
-            <div className="min-w-0">
-              <HeroTagPill>Superlabs Inc</HeroTagPill>
-              <h1 className="mt-6 max-w-[920px] font-dmSans text-[44px] font-semibold leading-[1.1] text-black sm:text-[48px]">
-                Voice and Recording-Led Setup Flow for AI Workflow Automation
-              </h1>
-              <p className={`mt-6 max-w-[900px] ${bodyClass}`}>
-                Latch (fka SuperLabs) is a pre-seed startup building a B2B product to capture how work
-                actually happens, structure it into machine-readable workflows, and enable AI systems to
-                automate them safely.
-              </p>
-            </div>
-            <div className="min-w-0">
-              <ImagePlaceholder
-                width="85%"
-                height={323}
-                className="mx-auto w-[85%] max-w-full"
-                imageSrc="/Hero_Image_CS.png"
-                imageAlt="Latch workflow automation interface — Show me how it's done"
-                imagePaddingClassName="p-[18px]"
-                imageClassName="max-h-full max-w-full shrink-0 object-contain"
-              />
+        <CaseStudySectionFrame>
+        <section className="flex flex-col">
+          <div className="px-6 pb-14 pt-14 sm:px-8">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start lg:gap-10">
+              <div className="min-w-0">
+                <HeroTagPill>Superlabs Inc</HeroTagPill>
+                <h1 className="mt-6 max-w-[920px] font-dmSans text-[44px] font-semibold leading-[1.1] text-black sm:text-[48px]">
+                  Voice and Recording-Led Setup Flow for AI Workflow Automation
+                </h1>
+                <p className={`mt-6 max-w-[900px] ${bodyClass}`}>
+                  Latch (fka SuperLabs) is a pre-seed startup building a B2B product to capture how work
+                  actually happens, structure it into machine-readable workflows, and enable AI systems to
+                  automate them safely.
+                </p>
+              </div>
+              <div className="min-w-0">
+                <ImagePlaceholder
+                  width="85%"
+                  height={323}
+                  className="mx-auto w-[85%] max-w-full"
+                  imageSrc="/Hero_Image_CS.png"
+                  imageAlt="Latch workflow automation interface — Show me how it's done"
+                  imagePaddingClassName="p-[18px]"
+                  imageClassName="max-h-full max-w-full shrink-0 object-contain"
+                />
+              </div>
             </div>
           </div>
+          {/* Meta strip — flush between page vertical guides (edge to edge of the rails) */}
           <div
             ref={statsRef}
-            className="mt-12 grid grid-cols-1 gap-px border border-solid border-[#e0e0e0] bg-[#e0e0e0] sm:grid-cols-2 lg:grid-cols-5"
+            className="relative left-1/2 grid grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border-t border-dotted border-[#b0b0a8] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-5"
+            style={{
+              width: `calc(100vw - ${HOME_GUIDE_SIDE_INSET_PX * 2}px)`,
+              transform: 'translateX(-50%)',
+            }}
           >
             {(
               [
@@ -1510,22 +1574,30 @@ export default function LatchCaseStudy() {
                 ['Status', 'Shipped • Spring 2026'],
               ] as const
             ).map(([k, v]) => (
-              <div key={k} className="bg-[#fdfcfa] px-5 py-6">
-                <p className="m-0 font-dmSans text-[13px] font-semibold uppercase tracking-wide text-[#555]">
+              <div key={k} className="min-w-0 bg-[#fdfcfa] px-4 py-5 sm:px-5 sm:py-6">
+                <p className="m-0 font-dmSans text-[12px] font-semibold uppercase tracking-wide text-[#555] sm:text-[13px]">
                   {k}
                 </p>
-                <p className="mt-2 mb-0 font-dmSans text-[15px] leading-snug text-black">{v}</p>
+                <p className="mt-2 mb-0 font-dmSans text-[14px] leading-snug text-black sm:text-[15px]">
+                  {v}
+                </p>
               </div>
             ))}
           </div>
         </section>
+        </CaseStudySectionFrame>
 
-        <LatchTldrSection />
+        <CaseStudySectionGap />
 
-        <SectionDivider />
+        <CaseStudySectionFrame>
+          <LatchTldrSection />
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 01 — Context */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className="px-6 py-14 sm:px-8">
           <SectionPill>01 • Context</SectionPill>
           <h2 className={`${sectionTitleClass} mt-4`}>
             Superlabs wants to let non-technical people automate their own work — without IT, without a
@@ -1558,17 +1630,20 @@ export default function LatchCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
 
-        <SectionDivider />
+        <CaseStudySectionGap />
 
-        <LatchResearchOverviewSection />
+        <CaseStudySectionFrame>
+          <LatchResearchOverviewSection />
+          <LatchInDepthSection statInterviews={statInterviews} statManual={statManual} />
+        </CaseStudySectionFrame>
 
-        <LatchInDepthSection statInterviews={statInterviews} statManual={statManual} />
-
-        <SectionDivider />
+        <CaseStudySectionGap />
 
         {/* 03 — Design Question */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className="px-6 py-14 sm:px-8">
           <div className="mb-6">
             <SectionPill>03 • Design Question</SectionPill>
             <div className="relative mt-10 flex flex-col gap-4 p-6 sm:gap-5 sm:p-8">
@@ -1582,64 +1657,71 @@ export default function LatchCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
 
-        <SectionDivider />
+        <CaseStudySectionGap />
 
         {/* 04 — Testing adoption signals */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className="px-6 py-14 sm:px-8">
           <div className="mb-6">
             <SectionPill>04 · Testing adoption signals</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>We built two working prototypes in Cursor and tested the extremes.</h2>
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
-              <div className="flex flex-wrap items-center gap-3">
-                <h3 className="m-0 font-dmSans text-[20px] font-semibold text-black">Prototype A</h3>
-                <span className="inline-block border border-solid border-[#e0e0e0] bg-white px-2 py-1 font-dmSans text-[12px] font-medium text-[#333]">
-                  ambient, minimal
-                </span>
+            <div className="flex min-w-0 flex-col">
+              <div className="border border-b-0 border-dotted border-[#b0b0a8] bg-[#fdfcfa] p-8">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="m-0 font-dmSans text-[20px] font-semibold text-black">Prototype A</h3>
+                  <span className="inline-block border border-dotted border-[#b0b0a8] bg-white px-2 py-1 font-dmSans text-[12px] font-medium text-[#333]">
+                    ambient, minimal
+                  </span>
+                </div>
+                <p className={`${bodyClass} mt-4`}>
+                  Favored by participants who wanted automation to feel like a quiet copilot—until something
+                  broke and they hunted for where Latch was “looking.”
+                </p>
+                <p className="mt-4 mb-0 font-dmSans text-[13px] font-semibold text-[#6B35B8]">
+                  Tension · Legibility vs. calm
+                </p>
               </div>
-              <p className={`${bodyClass} mt-4`}>
-                Favored by participants who wanted automation to feel like a quiet copilot—until something
-                broke and they hunted for where Latch was “looking.”
-              </p>
-              <p className="mt-4 mb-0 font-dmSans text-[13px] font-semibold text-[#6B35B8]">Tension · Legibility vs. calm</p>
+              <ImagePlaceholder
+                width="100%"
+                height={348}
+                label="Adoption testing - A"
+                className="w-full"
+                videoSrc="/latch-adoption-testing-recording.mov"
+                videoContainerClassName="pointer-events-none absolute inset-0 z-[1] flex items-start justify-center py-[30px] px-2 sm:px-3 [&_video]:pointer-events-auto"
+                videoClassName="w-full h-auto"
+              />
             </div>
-            <div className="border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
-              <div className="flex flex-wrap items-center gap-3">
-                <h3 className="m-0 font-dmSans text-[20px] font-semibold text-black">Prototype B</h3>
-                <span className="inline-block border border-solid border-[#e0e0e0] bg-white px-2 py-1 font-dmSans text-[12px] font-medium text-[#333]">
-                  Zoom-like, explicit control
-                </span>
+            <div className="flex min-w-0 flex-col">
+              <div className="border border-b-0 border-dotted border-[#b0b0a8] bg-[#fdfcfa] p-8">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="m-0 font-dmSans text-[20px] font-semibold text-black">Prototype B</h3>
+                  <span className="inline-block border border-dotted border-[#b0b0a8] bg-white px-2 py-1 font-dmSans text-[12px] font-medium text-[#333]">
+                    Zoom-like, explicit control
+                  </span>
+                </div>
+                <p className={`${bodyClass} mt-4`}>
+                  Preferred when participants wanted theatrical clarity—clear modes, obvious boundaries—at the
+                  cost of feeling “always on stage” during sensitive screens.
+                </p>
+                <p className="mt-4 mb-0 font-dmSans text-[13px] font-semibold text-[#6B35B8]">
+                  Tension · Performance anxiety
+                </p>
               </div>
-              <p className={`${bodyClass} mt-4`}>
-                Preferred when participants wanted theatrical clarity—clear modes, obvious boundaries—at the
-                cost of feeling “always on stage” during sensitive screens.
-              </p>
-              <p className="mt-4 mb-0 font-dmSans text-[13px] font-semibold text-[#6B35B8]">Tension · Performance anxiety</p>
+              <ImagePlaceholder
+                width="100%"
+                height={336}
+                label="Adoption testing - B"
+                className="w-full"
+                videoSrc="/latch-adoption-pearl-recording.mov"
+                videoContainerClassName="pointer-events-none absolute inset-0 z-[1] flex items-start justify-center py-[30px] px-2 sm:px-3 [&_video]:pointer-events-auto"
+                videoClassName="w-full h-auto"
+              />
             </div>
-          </div>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <ImagePlaceholder
-              width="100%"
-              height={348}
-              label="Adoption testing - A"
-              className="w-full"
-              videoSrc="/latch-adoption-testing-recording.mov"
-              videoContainerClassName="pointer-events-none absolute inset-0 z-[1] flex items-start justify-center py-[30px] px-2 sm:px-3 [&_video]:pointer-events-auto"
-              videoClassName="w-full h-auto"
-            />
-            <ImagePlaceholder
-              width="100%"
-              height={336}
-              label="Adoption testing - B"
-              className="w-full"
-              videoSrc="/latch-adoption-pearl-recording.mov"
-              videoContainerClassName="pointer-events-none absolute inset-0 z-[1] flex items-start justify-center py-[30px] px-2 sm:px-3 [&_video]:pointer-events-auto"
-              videoClassName="w-full h-auto"
-            />
           </div>
 
           <p className={`${sectionTitleClass} mt-10 max-w-[900px]`}>
@@ -1649,11 +1731,13 @@ export default function LatchCaseStudy() {
             So, we merged them into one direction, keeping the restraint of A and the legibility of B.
           </p>
         </section>
+        </CaseStudySectionFrame>
 
-        <SectionDivider />
+        <CaseStudySectionGap />
 
         {/* 05 — Features */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className="px-6 py-14 sm:px-8">
           <div className="mb-6">
             <SectionPill>05 • FEATURES</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>Privacy</h2>
@@ -1722,11 +1806,17 @@ export default function LatchCaseStudy() {
             ))}
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         <LatchFinalDesignsSection />
 
+        <CaseStudySectionGap />
+
         {/* 07 — Agent Behaviour */}
-        <section className="mt-20 py-14">
+        <CaseStudySectionFrame>
+        <section className="px-6 py-14 sm:px-8">
           <div className="mb-6">
             <SectionPill>07 • Agent Behaviour</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>Shaping Agent Behavior</h2>
@@ -1745,7 +1835,7 @@ export default function LatchCaseStudy() {
               hideCrossPattern
             />
 
-            <div className="flex h-full min-w-0 flex-col divide-y divide-[#e0e0e0] border-y border-solid border-[#e0e0e0]">
+            <div className="flex h-full min-w-0 flex-col divide-y divide-dotted divide-[#b0b0a8] border-y border-dotted border-[#b0b0a8]">
               {AGENT_BEHAVIOR_PRINCIPLES.map((principle) => (
                 <div
                   key={principle.title}
@@ -1762,9 +1852,13 @@ export default function LatchCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 08 — Responsible AI */}
-        <section className="mt-20 py-14">
+        <CaseStudySectionFrame>
+        <section className="px-6 py-14 sm:px-8">
           <div className="mb-6">
             <SectionPill>08 • Responsible AI</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>Responsible AI (RAI) and risk mitigation</h2>
@@ -1788,6 +1882,7 @@ export default function LatchCaseStudy() {
             ))}
           </div>
         </section>
+        </CaseStudySectionFrame>
       </main>
       </div>
     </div>

@@ -17,7 +17,7 @@ export default function HomePage() {
         aria-hidden
       />
       <PageCursorPixels />
-      <div className="relative z-[2]">
+      <div className="relative z-[2] overflow-x-hidden">
         <CinematicHero />
         {/* Mobile-only horizontal inset (16px); md:contents removes wrapper box on desktop. */}
         <div className="min-w-0 max-md:px-4 md:contents">

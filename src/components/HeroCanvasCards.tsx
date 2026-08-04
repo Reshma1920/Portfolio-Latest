@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
   playClickSound,
-  playHoverSound,
   unlockPortfolioAudio,
 } from '../audio/portfolioAudio'
 
@@ -170,7 +169,6 @@ function OverlayCard({
           aria-expanded={!minimized}
           className="inline-flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-[3px] border border-solid border-[#444444] bg-transparent p-0 font-dmSans text-[11px] font-medium leading-none text-[#888888] transition-colors hover:border-[#666666] hover:text-[#bbbbbb]"
           onPointerDown={(e) => e.stopPropagation()}
-          onMouseEnter={() => playHoverSound()}
           onClick={() => {
             unlockPortfolioAudio()
             playClickSound()

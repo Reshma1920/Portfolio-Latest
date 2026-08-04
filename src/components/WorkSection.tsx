@@ -1,7 +1,13 @@
 'use client'
 
+import type { CSSProperties, ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import {
+  HOME_GUIDE_LINE,
+  HOME_GUIDE_MARKER_PX,
+  HOME_GUIDE_SIDE_INSET_PX,
+} from '../case-studies/caseStudyLayout'
 
 const VIDEO_TRIM_START_SEC = 7
 const VIDEO_TRIM_END_SEC = 32
@@ -23,26 +29,98 @@ const BULLETS = [
   'Placeholder bullet noting measurable outcomes and iteration cycles.',
 ]
 
-function CornerBrackets() {
+function GuideMark({
+  className = '',
+  style,
+}: {
+  className?: string
+  style?: CSSProperties
+}) {
+  return (
+    <span
+      className={`pointer-events-none absolute z-[30] bg-black ${className}`}
+      style={{
+        width: HOME_GUIDE_MARKER_PX,
+        height: HOME_GUIDE_MARKER_PX,
+        ...style,
+      }}
+      aria-hidden
+    />
+  )
+}
+
+/** Solid black squares at the four corners of each case study card. */
+function CardCornerMarks() {
+  const half = HOME_GUIDE_MARKER_PX / 2
+  return (
+    <>
+      <GuideMark
+        className="left-0 top-0"
+        style={{ marginLeft: -half, marginTop: -half }}
+      />
+      <GuideMark
+        className="right-0 top-0"
+        style={{ marginRight: -half, marginTop: -half }}
+      />
+      <GuideMark
+        className="bottom-0 left-0"
+        style={{ marginLeft: -half, marginBottom: -half }}
+      />
+      <GuideMark
+        className="bottom-0 right-0"
+        style={{ marginRight: -half, marginBottom: -half }}
+      />
+    </>
+  )
+}
+
+/**
+ * L-markers on the media panel — only where they don’t sit on the same
+ * corner as a card-level black square.
+ * - Desktop: keep left (column-split) corners; drop right (card edge) corners
+ * - Mobile: keep top (mid-card) corners; drop bottom (card edge) corners
+ */
+function MediaCornerBrackets() {
   return (
     <>
       <span
-        className="pointer-events-none absolute left-0 top-0 z-[3] h-2 w-2 border-solid border-black border-l-[1px] border-t-[1px]"
+        className="pointer-events-none absolute left-0 top-0 z-[30] h-2 w-2 border-solid border-black border-l-[1px] border-t-[1px]"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute right-0 top-0 z-[3] h-2 w-2 border-solid border-black border-r-[1px] border-t-[1px]"
+        className="pointer-events-none absolute right-0 top-0 z-[30] h-2 w-2 border-solid border-black border-r-[1px] border-t-[1px] md:hidden"
         aria-hidden
       />
       <span
-        className="pointer-events-none absolute bottom-0 left-0 z-[3] h-2 w-2 border-solid border-black border-b-[1px] border-l-[1px]"
-        aria-hidden
-      />
-      <span
-        className="pointer-events-none absolute bottom-0 right-0 z-[3] h-2 w-2 border-solid border-black border-b-[1px] border-r-[1px]"
+        className="pointer-events-none absolute bottom-0 left-0 z-[30] hidden h-2 w-2 border-solid border-black border-b-[1px] border-l-[1px] md:block"
         aria-hidden
       />
     </>
+  )
+}
+
+/**
+ * Full-bleed top/bottom horizontals on each case card.
+ * Drawn under card content; card corner squares sit above.
+ */
+function WorkCardGuideFrame({ children }: { children: ReactNode }) {
+  return (
+    <div className="relative">
+      <div
+        className="pointer-events-none absolute inset-y-0 left-1/2 z-[10] w-screen -translate-x-1/2"
+        aria-hidden
+      >
+        <span
+          className="absolute inset-x-0 top-0 h-px"
+          style={{ backgroundColor: HOME_GUIDE_LINE }}
+        />
+        <span
+          className="absolute inset-x-0 bottom-0 h-px"
+          style={{ backgroundColor: HOME_GUIDE_LINE }}
+        />
+      </div>
+      <div className="relative z-[20]">{children}</div>
+    </div>
   )
 }
 
@@ -168,6 +246,7 @@ function ProjectCard({
 
   return (
     <article className="relative flex w-full flex-col border border-solid border-[#e0e0e0] bg-white md:flex-row md:items-stretch">
+      <CardCornerMarks />
 
       {/* Left column — text */}
       <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-0">
@@ -220,8 +299,8 @@ function ProjectCard({
         </div>
       </div>
 
-      {/* Right column — cross pattern + optional centered video + corner markers */}
-      <div className="relative max-md:aspect-[16/10] w-full shrink-0 border-t border-solid border-[#e0e0e0] md:aspect-auto md:w-[55%] md:border-t-0 md:min-h-0 md:self-stretch">
+      {/* Right column — cross pattern + optional centered video + non-overlapping corner markers */}
+      <div className="relative max-md:aspect-[16/10] w-full shrink-0 overflow-visible border-t border-solid border-[#e0e0e0] md:aspect-auto md:w-[55%] md:border-t-0 md:min-h-0 md:self-stretch">
         <div
           className="absolute inset-0 bg-[url('/crosspattern.png')] bg-repeat opacity-40"
           aria-hidden
@@ -289,7 +368,7 @@ function ProjectCard({
             />
           </div>
         ) : null}
-        <CornerBrackets />
+        <MediaCornerBrackets />
       </div>
     </article>
   )
@@ -297,78 +376,104 @@ function ProjectCard({
 
 export function WorkSection() {
   return (
-    <section id="work" className="w-full font-dmSans">
-      {/* Outer padding matches CinematicHero nav wrapper (px-3 sm:px-5); inner width matches nav bar (max-w-7xl). */}
-      <div className="px-3 sm:px-5">
-        <div className="mx-auto w-full max-w-7xl pb-[80px] pt-0">
-          <div className="mb-[70px] flex items-baseline justify-between gap-6 px-[40px]">
-            <h2 className="font-display text-left text-[40px] font-medium text-[#000000]">
-              //Selected Work
-            </h2>
-            <p className="shrink-0 text-right font-dmSans text-[14px] font-normal leading-snug text-[#646464]">
-              Enterprise, B2B, Financial Services
-            </p>
-          </div>
+    <section id="work" className="w-full pt-[100px] font-dmSans">
+      {/* Title aligns to the same 90px guide inset as the case study cards */}
+      <div
+        className="mb-[70px] flex items-baseline justify-between gap-6 px-0 md:px-[90px]"
+      >
+        <h2 className="flex items-center gap-3 font-display text-left text-[40px] font-medium text-[#000000]">
+          <span
+            className="inline-block shrink-0 bg-black md:-translate-x-1/2"
+            style={{ width: HOME_GUIDE_MARKER_PX, height: HOME_GUIDE_MARKER_PX }}
+            aria-hidden
+          />
+          Selected Work
+        </h2>
+        <p className="shrink-0 text-right font-dmSans text-[14px] font-normal leading-snug text-[#646464]">
+          Enterprise, B2B, Financial Services
+        </p>
+      </div>
 
-          <div className="flex flex-col gap-[142px]">
-            <Link
-              href="/latch"
-              onClick={() => {
-                window.scrollTo(0, 0)
-              }}
-              className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
-              aria-label="Open Latch case study (SuperLabs)"
-            >
+      <div className="relative w-full pb-[80px]">
+        {/* Continuous outer verticals at hero inset — desktop only; under cards so corner marks stay visible */}
+        <div className="pointer-events-none absolute inset-0 z-[10] hidden md:block" aria-hidden>
+          <span
+            className="absolute inset-y-0 w-px"
+            style={{ left: HOME_GUIDE_SIDE_INSET_PX, backgroundColor: HOME_GUIDE_LINE }}
+          />
+          <span
+            className="absolute inset-y-0 w-px"
+            style={{ right: HOME_GUIDE_SIDE_INSET_PX, backgroundColor: HOME_GUIDE_LINE }}
+          />
+        </div>
+
+        {/* Cards stretch flush to the 90px verticals on desktop */}
+        <div className="relative z-[20] flex w-full flex-col gap-[142px] px-0 md:px-[90px]">
+            <WorkCardGuideFrame>
+              <Link
+                href="/latch"
+                onClick={() => {
+                  window.scrollTo(0, 0)
+                }}
+                className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
+                aria-label="Open Latch case study (SuperLabs)"
+              >
+                <ProjectCard
+                  companyName="Latch AI"
+                  logoSrc="/superlabs-logo.png"
+                  projectTitle="Voice and Recording-Led Setup Flow for AI Workflow Automation"
+                  description="Designing for the tension between delegation and control — where users hand off work to AI without losing transparency or trust."
+                  bullets={[]}
+                  tags={[
+                    'Enterprise UX',
+                    'B2B',
+                    'Workflow Automation',
+                    'Privacy & Trust',
+                  ]}
+                  mediaVideoSrc="/Latch_Final.mov"
+                  mediaVideoFullDuration
+                />
+              </Link>
+            </WorkCardGuideFrame>
+
+            <WorkCardGuideFrame>
+              <Link
+                href="/hdfc"
+                onClick={() => {
+                  window.scrollTo(0, 0)
+                }}
+                className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
+                aria-label="Open HDFC case study"
+              >
+                <ProjectCard
+                  companyName="HDFC Bank"
+                  logoSrc="/hdfc-bank-logo.png"
+                  projectTitle="Enterprise Loan Management Platform for India's Largest Private Bank"
+                  description="End-to-end B2B platform enabling real estate developers to manage construction-linked loan disbursements, track project progress, and eliminate dependency on bank agents — built for scale across 500K+ users."
+                  bullets={[]}
+                  mediaVideoSrc="/HDFC%20Video%20.mp4"
+                  mediaVideoPaddingPx={30}
+                />
+              </Link>
+            </WorkCardGuideFrame>
+
+            <WorkCardGuideFrame>
               <ProjectCard
-                companyName="Latch AI"
-                logoSrc="/superlabs-logo.png"
-                projectTitle="Voice and Recording-Led Setup Flow for AI Workflow Automation"
-                description="Designing for the tension between delegation and control — where users hand off work to AI without losing transparency or trust."
-                bullets={[]}
-                tags={[
-                  'Enterprise UX',
-                  'B2B',
-                  'Workflow Automation',
-                  'Privacy & Trust',
+                companyName="Zsuite Technologies"
+                projectTitle="Redesigning APR configuration workflow for financial institutions that reduced ops team dependency"
+                description="Enabling self-service interest rate configuration for financial institutions by redesigning an internal, ops-only workflow."
+                bullets={[
+                  'Simplified a multi-level payment distribution system across 13 verticals.',
+                  'Enabled clear APR management that could scale to 120+ FI users and impact 2,000+ subaccounts per institution.',
                 ]}
-                mediaVideoSrc="/Latch_Final.mov"
-                mediaVideoFullDuration
+                mediaLayered={{
+                  baseSrc: '/superlabs-fi-dashboard-base.png',
+                  baseAlt:
+                    'ZSuite FI Settings dashboard with category list, organization and subaccounts tables, and Interest Information panel',
+                }}
+                comingSoon
               />
-            </Link>
-            <Link
-              href="/hdfc"
-              onClick={() => {
-                window.scrollTo(0, 0)
-              }}
-              className="block text-inherit no-underline outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black/40"
-              aria-label="Open HDFC case study"
-            >
-              <ProjectCard
-                companyName="HDFC Bank"
-                logoSrc="/hdfc-bank-logo.png"
-                projectTitle="Enterprise Loan Management Platform for India's Largest Private Bank"
-                description="End-to-end B2B platform enabling real estate developers to manage construction-linked loan disbursements, track project progress, and eliminate dependency on bank agents — built for scale across 500K+ users."
-                bullets={[]}
-                mediaVideoSrc="/HDFC%20Video%20.mp4"
-                mediaVideoPaddingPx={30}
-              />
-            </Link>
-            <ProjectCard
-              companyName="Zsuite Technologies"
-              projectTitle="Redesigning APR configuration workflow for financial institutions that reduced ops team dependency"
-              description="Enabling self-service interest rate configuration for financial institutions by redesigning an internal, ops-only workflow."
-              bullets={[
-                'Simplified a multi-level payment distribution system across 13 verticals.',
-                'Enabled clear APR management that could scale to 120+ FI users and impact 2,000+ subaccounts per institution.',
-              ]}
-              mediaLayered={{
-                baseSrc: '/superlabs-fi-dashboard-base.png',
-                baseAlt:
-                  'ZSuite FI Settings dashboard with category list, organization and subaccounts tables, and Interest Information panel',
-              }}
-              comingSoon
-            />
-          </div>
+            </WorkCardGuideFrame>
         </div>
       </div>
     </section>

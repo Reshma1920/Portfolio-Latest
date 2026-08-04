@@ -1,12 +1,10 @@
 'use client'
 
 const PIXEL_DRAG_SRC = '/Pixel%20draging%20.mp3'
-const HOVER_SRC = '/Hover%20sound.mp3'
 const CLICK_SRC = '/Click-enter%20Sounds.mp3'
 
 type Sounds = {
   pixelDrag: HTMLAudioElement
-  hover: HTMLAudioElement
   click: HTMLAudioElement
 }
 
@@ -18,7 +16,6 @@ function getSounds(): Sounds | null {
   if (typeof Audio === 'undefined') return null
   sounds = {
     pixelDrag: new Audio(PIXEL_DRAG_SRC),
-    hover: new Audio(HOVER_SRC),
     click: new Audio(CLICK_SRC),
   }
   return sounds
@@ -36,7 +33,6 @@ export function preloadPortfolioSounds(): void {
 
   s.pixelDrag.loop = true
   s.pixelDrag.preload = 'auto'
-  s.hover.preload = 'auto'
   s.click.preload = 'auto'
 
   for (const audio of Object.values(s)) {
@@ -56,7 +52,7 @@ export function unlockPortfolioAudio(): void {
   const s = getSounds()
   if (!s) return
 
-  const probe = s.hover.cloneNode(true) as HTMLAudioElement
+  const probe = s.click.cloneNode(true) as HTMLAudioElement
   probe.volume = 0.001
   void probe.play().then(() => probe.pause()).catch(() => {})
 }
@@ -65,15 +61,6 @@ export function getPixelDragAudio(): HTMLAudioElement {
   const s = getSounds()
   // If called during SSR (shouldn't happen), return a dummy element.
   return s?.pixelDrag ?? ({} as HTMLAudioElement)
-}
-
-export function playHoverSound(): void {
-  if (!unlocked) return
-  const s = getSounds()
-  if (!s) return
-  const clip = s.hover.cloneNode(true) as HTMLAudioElement
-  clip.volume = 0.2
-  void clip.play().catch(() => {})
 }
 
 export function playClickSound(): void {

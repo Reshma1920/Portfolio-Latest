@@ -1,63 +1,172 @@
 'use client'
 
+import { HOME_GUIDE_SIDE_INSET_PX } from '../case-studies/caseStudyLayout'
 import { SiteNav, SiteNavSpacer } from './SiteNav'
-import { HeroAmbientPixels } from './HeroAmbientPixels'
 
-const HERO_SIDE_INSET_PX = 90
+const HERO_SIDE_INSET_PX = HOME_GUIDE_SIDE_INSET_PX
 const NAV_SPACER_PX = 57
-/** Distance from viewport bottom to the hero horizontal rule. */
-const HERO_LINE_BOTTOM_OFFSET_PX = 90
+/** Distance from viewport bottom to the top rule of the footer meta band. */
+const HERO_BAND_TOP_FROM_BOTTOM_PX = 90
+/** Distance from viewport bottom to the bottom rule of the footer meta band. */
+const HERO_BAND_BOTTOM_FROM_BOTTOM_PX = 24
+/** Width of the left/right meta cells between the outer guides. */
+const HERO_SIDE_CELL_PX = 220
+const GUIDE_LINE = '#D6D6D6'
+/** Solid black square centered on each guide intersection. */
+const GUIDE_MARKER_PX = 6
 
-function HeroGuideCornerMarkers() {
-  const cornerClass = 'pointer-events-none absolute z-[20] h-2 w-2 border-solid border-black'
-  const inset = `${HERO_SIDE_INSET_PX}px`
-  const navTop = `${NAV_SPACER_PX}px`
-  const ruleBottom = `${HERO_LINE_BOTTOM_OFFSET_PX}px`
+const labelClass =
+  'font-dmSans text-[12px] font-medium tracking-[-0.01em] text-[#646464] sm:text-[13px]'
+
+/**
+ * Technical guide frame for the hero:
+ * - Horizontals run edge-to-edge
+ * - Verticals run from the top of the screen (through the nav) through the footer band
+ * - Footer band is split into small | long | small cells with black squares at every intersection
+ */
+function HeroGuideFrame() {
+  const inset = HERO_SIDE_INSET_PX
+  const half = GUIDE_MARKER_PX / 2
+  const topRule = NAV_SPACER_PX
+  const bandTop = HERO_BAND_TOP_FROM_BOTTOM_PX
+  const bandBottom = HERO_BAND_BOTTOM_FROM_BOTTOM_PX
+  const sideCell = HERO_SIDE_CELL_PX
+
+  const markers: Array<{ left: number | string; top: number | string }> = [
+    // Top frame corners (below nav)
+    { left: inset, top: topRule },
+    { left: `calc(100% - ${inset}px)`, top: topRule },
+    // Footer band markers (left→right): bottom, top, top, bottom
+    { left: inset + sideCell, top: `calc(100% - ${bandTop}px)` },
+    { left: `calc(100% - ${inset + sideCell}px)`, top: `calc(100% - ${bandTop}px)` },
+    { left: inset, top: `calc(100% - ${bandBottom}px)` },
+    { left: `calc(100% - ${inset}px)`, top: `calc(100% - ${bandBottom}px)` },
+  ]
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-[20]" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 z-[70]" aria-hidden>
+      {/* Top horizontal — full bleed */}
       <span
-        className={`${cornerClass} border-l-[1px] border-t-[1px]`}
-        style={{ left: inset, top: navTop }}
+        className="absolute inset-x-0 h-px"
+        style={{ top: topRule, backgroundColor: GUIDE_LINE }}
       />
+      {/* Footer band — top horizontal */}
       <span
-        className={`${cornerClass} border-r-[1px] border-t-[1px]`}
-        style={{ right: inset, top: navTop }}
+        className="absolute inset-x-0 h-px"
+        style={{ bottom: bandTop, backgroundColor: GUIDE_LINE }}
       />
+      {/* Footer band — bottom horizontal */}
       <span
-        className={`${cornerClass} border-b-[1px] border-l-[1px]`}
-        style={{ left: inset, bottom: ruleBottom }}
+        className="absolute inset-x-0 h-px"
+        style={{ bottom: bandBottom, backgroundColor: GUIDE_LINE }}
       />
+
+      {/* Outer left vertical — top of screen through band */}
       <span
-        className={`${cornerClass} border-b-[1px] border-r-[1px]`}
-        style={{ right: inset, bottom: ruleBottom }}
+        className="absolute top-0 w-px"
+        style={{
+          left: inset,
+          bottom: bandBottom,
+          backgroundColor: GUIDE_LINE,
+        }}
       />
+      {/* Outer right vertical — top of screen through band */}
+      <span
+        className="absolute top-0 w-px"
+        style={{
+          right: inset,
+          bottom: bandBottom,
+          backgroundColor: GUIDE_LINE,
+        }}
+      />
+
+      {/* Inner left cell divider (band only) */}
+      <span
+        className="absolute w-px"
+        style={{
+          left: inset + sideCell,
+          bottom: bandBottom,
+          height: bandTop - bandBottom,
+          backgroundColor: GUIDE_LINE,
+        }}
+      />
+      {/* Inner right cell divider (band only) */}
+      <span
+        className="absolute w-px"
+        style={{
+          right: inset + sideCell,
+          bottom: bandBottom,
+          height: bandTop - bandBottom,
+          backgroundColor: GUIDE_LINE,
+        }}
+      />
+
+      {markers.map((marker, i) => (
+        <span
+          key={i}
+          className="absolute bg-black"
+          style={{
+            width: GUIDE_MARKER_PX,
+            height: GUIDE_MARKER_PX,
+            left: marker.left,
+            top: marker.top,
+            marginLeft: -half,
+            marginTop: -half,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function HeroFooterBand() {
+  const bandHeight = HERO_BAND_TOP_FROM_BOTTOM_PX - HERO_BAND_BOTTOM_FROM_BOTTOM_PX
+
+  return (
+    <div
+      className="absolute inset-x-0 z-[15] flex items-center"
+      style={{
+        bottom: HERO_BAND_BOTTOM_FROM_BOTTOM_PX,
+        height: bandHeight,
+        paddingLeft: HERO_SIDE_INSET_PX,
+        paddingRight: HERO_SIDE_INSET_PX,
+      }}
+    >
+      <p
+        className={`${labelClass} flex h-full items-center justify-center text-center`}
+        style={{ width: HERO_SIDE_CELL_PX, paddingInline: 16 }}
+      >
+        2026 DEI award
+      </p>
+      <div className="min-w-0 flex-1" aria-hidden />
+      <p
+        className={`${labelClass} flex h-full items-center justify-center text-center`}
+        style={{ width: HERO_SIDE_CELL_PX, paddingInline: 16 }}
+      >
+        MS HCDE @UW
+      </p>
     </div>
   )
 }
 
 export function CinematicHero() {
-  const heroContentMinHeight = `calc(100vh - ${NAV_SPACER_PX}px - ${HERO_LINE_BOTTOM_OFFSET_PX}px - 1px)`
+  const heroContentMinHeight = `calc(100vh - ${NAV_SPACER_PX}px - ${HERO_BAND_TOP_FROM_BOTTOM_PX}px - 1px)`
 
   return (
     <div
       id="home"
-      className="relative min-h-screen w-full overflow-x-hidden text-foreground"
+      className="relative min-h-screen w-full text-foreground"
     >
       <SiteNav variant="home" />
       <SiteNavSpacer />
-      <HeroAmbientPixels
-        topOffsetPx={NAV_SPACER_PX}
-        bottomOffsetPx={HERO_LINE_BOTTOM_OFFSET_PX + 1}
-        sideInsetPx={HERO_SIDE_INSET_PX}
-      />
-      <HeroGuideCornerMarkers />
+      <HeroGuideFrame />
+      <HeroFooterBand />
 
       <div
         className="pointer-events-none absolute z-10 flex justify-center pb-[40px]"
         style={{
           top: `${NAV_SPACER_PX}px`,
-          bottom: `${HERO_LINE_BOTTOM_OFFSET_PX + 1}px`,
+          bottom: `${HERO_BAND_TOP_FROM_BOTTOM_PX + 1}px`,
           left: 0,
           width: `${HERO_SIDE_INSET_PX}px`,
         }}
@@ -82,17 +191,6 @@ export function CinematicHero() {
           className="relative flex items-center justify-center"
           style={{ minHeight: heroContentMinHeight }}
         >
-          <div className="pointer-events-none absolute inset-0" aria-hidden>
-            <span
-              className="absolute inset-y-0 w-px bg-[#e0e0e0]"
-              style={{ left: `${HERO_SIDE_INSET_PX}px` }}
-            />
-            <span
-              className="absolute inset-y-0 w-px bg-[#e0e0e0]"
-              style={{ right: `${HERO_SIDE_INSET_PX}px` }}
-            />
-          </div>
-
           <header
             className="relative w-full text-center"
             style={{
@@ -127,14 +225,6 @@ export function CinematicHero() {
           </header>
         </div>
       </section>
-
-      <div
-        className="pointer-events-none absolute inset-x-0 z-10"
-        style={{ bottom: `${HERO_LINE_BOTTOM_OFFSET_PX}px` }}
-        aria-hidden
-      >
-        <div className="h-px w-full bg-[#e0e0e0]" />
-      </div>
     </div>
   )
 }
