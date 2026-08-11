@@ -1,6 +1,8 @@
 'use client'
 
-import { HOME_GUIDE_SIDE_INSET_PX } from '../case-studies/caseStudyLayout'
+import {
+  HOME_GUIDE_SIDE_INSET_PX,
+} from '../case-studies/caseStudyLayout'
 import { SiteNav, SiteNavSpacer } from './SiteNav'
 
 const HERO_SIDE_INSET_PX = HOME_GUIDE_SIDE_INSET_PX
@@ -192,7 +194,7 @@ export function CinematicHero() {
           style={{ minHeight: heroContentMinHeight }}
         >
           <header
-            className="relative w-full text-center"
+            className="relative z-10 w-full text-center"
             style={{
               paddingLeft: `${HERO_SIDE_INSET_PX}px`,
               paddingRight: `${HERO_SIDE_INSET_PX}px`,
@@ -200,7 +202,7 @@ export function CinematicHero() {
           >
             <div className="flex flex-col items-center">
               <span className="animate-fade-rise inline-flex rounded-none bg-[rgba(107,53,184,0.12)] px-[11px] py-1.5 font-dmSans text-[15px] font-medium leading-none text-[#6B35B8]">
-                {'//Product Designer'}
+                Building fast, failing early.
               </span>
               <h1
                 className="animate-fade-rise mt-[26px] font-display text-[56px] font-normal text-[#000000] sm:text-[68px] md:text-[80px] lg:text-[88px] xl:text-[96px]"
@@ -218,8 +220,8 @@ export function CinematicHero() {
                 </span>
               </h1>
               <p className="animate-fade-rise-delay mt-10 max-w-xl text-[15px] leading-relaxed text-[#646464] sm:text-[16px] md:text-[16px] md:leading-relaxed lg:text-[17px]">
-                4+ years building for Enterprise B2B. Simplifying human experiences for complex systems
-                by connecting data, workflows and decisions.
+                Simplifying human experiences for complex systems by connecting data, workflows and
+                decisions.
               </p>
             </div>
           </header>

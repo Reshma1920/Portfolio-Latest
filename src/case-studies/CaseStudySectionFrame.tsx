@@ -3,6 +3,8 @@
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 import {
+  GUIDE_DOT_BACKGROUND_IMAGE,
+  GUIDE_DOT_BACKGROUND_SIZE,
   HOME_GUIDE_LINE,
   HOME_GUIDE_MARKER_PX,
   HOME_GUIDE_SIDE_INSET_PX,
@@ -26,9 +28,8 @@ export const CASE_STUDY_SECTION_DOT_BAND_PX = 40
 export const CASE_STUDY_BREAK_PAGE_VERTICALS_ATTR = 'data-break-page-verticals'
 
 const DOT_FILL_STYLE: CSSProperties = {
-  backgroundImage:
-    'radial-gradient(circle, rgba(158,158,150,0.55) 0.65px, transparent 0.7px)',
-  backgroundSize: '7px 7px',
+  backgroundImage: GUIDE_DOT_BACKGROUND_IMAGE,
+  backgroundSize: GUIDE_DOT_BACKGROUND_SIZE,
   backgroundPosition: 'center top',
 }
 
