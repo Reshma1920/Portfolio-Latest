@@ -6,7 +6,8 @@ import Link from 'next/link'
 import {
   HOME_GUIDE_LINE,
   HOME_GUIDE_MARKER_PX,
-  HOME_GUIDE_SIDE_INSET_PX,
+  HOME_GUIDE_SIDE_FLUSH_CLASS,
+  HOME_GUIDE_SIDE_PADDING_CLASS,
 } from '../case-studies/caseStudyLayout'
 
 const VIDEO_TRIM_START_SEC = 7
@@ -377,9 +378,9 @@ function ProjectCard({
 export function WorkSection() {
   return (
     <section id="work" className="w-full pt-[100px] font-dmSans">
-      {/* Title aligns to the same 90px guide inset as the case study cards */}
+      {/* Title aligns to the same guide inset as the case study cards */}
       <div
-        className="mb-[70px] flex items-baseline justify-between gap-6 px-0 md:px-[90px]"
+        className={`mb-[70px] flex items-baseline justify-between gap-6 ${HOME_GUIDE_SIDE_PADDING_CLASS}`}
       >
         <h2 className="flex items-center gap-3 font-display text-left text-[40px] font-medium text-[#000000]">
           <span
@@ -395,20 +396,8 @@ export function WorkSection() {
       </div>
 
       <div className="relative w-full pb-[80px]">
-        {/* Continuous outer verticals at hero inset — desktop only; under cards so corner marks stay visible */}
-        <div className="pointer-events-none absolute inset-0 z-[10] hidden md:block" aria-hidden>
-          <span
-            className="absolute inset-y-0 w-px"
-            style={{ left: HOME_GUIDE_SIDE_INSET_PX, backgroundColor: HOME_GUIDE_LINE }}
-          />
-          <span
-            className="absolute inset-y-0 w-px"
-            style={{ right: HOME_GUIDE_SIDE_INSET_PX, backgroundColor: HOME_GUIDE_LINE }}
-          />
-        </div>
-
-        {/* Cards stretch flush to the 90px verticals on desktop */}
-        <div className="relative z-[20] flex w-full flex-col gap-[142px] px-0 md:px-[90px]">
+        {/* Cards flush to guide rails — card borders are the vertical lines (no duplicate rails) */}
+        <div className={`relative z-[20] flex w-full flex-col gap-[142px] ${HOME_GUIDE_SIDE_FLUSH_CLASS}`}>
             <WorkCardGuideFrame>
               <Link
                 href="/latch"

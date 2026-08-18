@@ -3,7 +3,7 @@
 import { Helmet } from 'react-helmet-async'
 import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
 import { CaseStudyGuideBreakOverlay, CaseStudyPageDotGutters, CaseStudyPageVerticals, CaseStudySectionFrame, CaseStudySectionGap } from './CaseStudySectionFrame'
-import { caseStudyContainerClass, caseStudyMainClass, caseStudyPageOuterClass, HOME_GUIDE_MARKER_PX, HOME_GUIDE_SIDE_INSET_PX } from './caseStudyLayout'
+import { caseStudyContainerClass, caseStudyMainClass, caseStudyPageOuterClass, CASE_STUDY_SECTION_INNER_CLASS, HOME_GUIDE_MARKER_PX } from './caseStudyLayout'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -143,7 +143,13 @@ function ImagePlaceholder({
         height: '100%',
         ...(minH !== undefined ? { minHeight: minH } : {}),
       }
-    : effectiveHasImage && !centerImageInFrame
+    : hasVideo && height === 'auto'
+      ? {
+          width: w,
+          maxWidth: '100%',
+          height: 'auto',
+        }
+      : effectiveHasImage && !centerImageInFrame
       ? {
           width: w,
           maxWidth: '100%',
@@ -154,6 +160,7 @@ function ImagePlaceholder({
           width: w,
           maxWidth: '100%',
           height: h,
+          overflow: 'hidden',
           ...(minH !== undefined ? { minHeight: minH } : {}),
         }
 
@@ -215,7 +222,7 @@ function ImagePlaceholder({
     <div
       ref={rootRef}
       style={outerStyle}
-      className={`relative box-border bg-[#f0eeea] ${borderClass} ${outerFlexClass} ${className} ${effectiveHasImage && centerImageInFrame ? 'flex min-h-0 flex-col' : ''}`}
+      className={`relative box-border overflow-hidden bg-[#f0eeea] ${borderClass} ${outerFlexClass} ${className} ${effectiveHasImage && centerImageInFrame ? 'flex min-h-0 flex-col' : ''}`}
     >
       {showCrossPatternLayer ? (
         <div className="absolute inset-0 bg-[url('/cross_pattern.png')] bg-repeat opacity-40" aria-hidden />
@@ -252,12 +259,12 @@ function ImagePlaceholder({
       ) : null}
       {effectiveHasImage ? (
         <div
-          className={`relative z-[1] min-h-0 ${centerImageInFrame ? 'flex flex-1 flex-col items-center justify-center' : ''} ${imagePaddingClassName ?? 'p-6 sm:p-10'}`}
+          className={`relative z-[1] min-h-0 overflow-hidden ${centerImageInFrame ? 'flex flex-1 flex-col items-center justify-center' : ''} ${imagePaddingClassName ?? 'p-6 sm:p-10'}`}
         >
           <img
             src={imageSrc}
             alt={imageAlt}
-            className={`mx-auto h-auto w-full max-w-full object-contain ${imageClassName ?? ''}`}
+            className={`mx-auto h-auto max-h-full w-auto max-w-full object-contain ${imageClassName ?? ''}`}
             loading="lazy"
             decoding="async"
           />
@@ -339,7 +346,7 @@ const RESEARCH_OVERVIEW_COLUMNS: ResearchOverviewColumn[] = [
 
 function LatchResearchOverviewSection() {
   return (
-    <section className="px-6 pb-6 pt-14 sm:px-8">
+    <section className={CASE_STUDY_SECTION_INNER_CLASS}>
       <SectionPill>02 • Research Overview</SectionPill>
 
       <div className="mt-10 grid grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border border-dotted border-[#b0b0a8] bg-white md:grid-cols-3 md:grid-rows-[repeat(6,auto)] md:divide-x md:divide-y-0">
@@ -419,7 +426,7 @@ function LatchTldrSection() {
   const cardPaddingClass = 'px-6 py-6 sm:px-7 sm:py-7'
 
   return (
-    <section className="px-6 py-14 sm:px-8">
+    <section className={CASE_STUDY_SECTION_INNER_CLASS}>
       <h2 className={sectionTitleClass}>TL;DR</h2>
 
       <div className="relative mt-6 border border-dotted border-[#b0b0a8] bg-[#fdfcfa]">
@@ -794,7 +801,7 @@ function LatchInDepthSection({
   statManual: number
 }) {
   return (
-    <section className="px-6 pb-14 pt-8 sm:px-8">
+    <section className="px-6 pb-6 pt-8 sm:px-8">
       <p className="m-0 font-dmSans text-[13px] font-semibold uppercase tracking-wide text-[#555]">In Depth</p>
 
       <div className="mt-4 border border-dotted border-[#b0b0a8] bg-transparent">
@@ -1019,7 +1026,7 @@ function FinalDesignPanel({
     <div
       id={panel.id}
       ref={panelRef}
-      className="relative scroll-mt-[100px] border border-solid border-white/25 bg-[#050505] p-6 sm:p-8 md:scroll-mt-[120px] lg:sticky lg:mb-8 lg:scroll-mt-[120px]"
+      className="relative scroll-mt-[100px] border border-solid border-white/25 bg-[#050505] p-6 sm:p-8 md:scroll-mt-[120px] lg:sticky lg:-mb-px lg:scroll-mt-[120px]"
       style={{
         top: FINAL_DESIGN_STICKY_TOP_PX,
         zIndex: index + 1,
@@ -1125,7 +1132,7 @@ function LatchFinalDesignsSection() {
   return (
     <section
       data-break-page-verticals=""
-      className="relative z-[2] ml-[calc(50%-50vw)] w-screen max-w-[100vw] bg-[#050505] py-16 text-white sm:py-24"
+      className="relative z-[2] -ml-5 w-[calc(100%+2.5rem)] bg-[#050505] py-16 text-white sm:-ml-8 sm:w-[calc(100%+4rem)] sm:py-24 md:-ml-[calc(var(--guide-side-inset)+2.5rem)] md:w-[calc(100%+2*var(--guide-side-inset)+5rem)]"
     >
       <div className={caseStudyContainerClass}>
         <div className="grid gap-14 p-8 sm:p-10 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
@@ -1174,7 +1181,7 @@ function LatchFinalDesignsSection() {
             </nav>
           </aside>
 
-          <div className="relative flex flex-col gap-8 lg:col-span-8 lg:gap-0 lg:pt-[52px]">
+          <div className="relative flex flex-col gap-8 overflow-visible lg:col-span-8 lg:gap-0 lg:pt-[52px]">
             {FINAL_DESIGN_PANELS.map((panel, i) => (
               <FinalDesignPanel
                 key={panel.id}
@@ -1303,31 +1310,12 @@ function FeaturesEyeIcon() {
   )
 }
 
-function FeaturesDragIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M8 6v12M12 6v12M16 6v12" stroke="#6B35B8" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M5 9h3M5 15h3M16 9h3M16 15h3" stroke="#6B35B8" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 function FeaturesMonitorCheckIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
       <rect x="3" y="5" width="18" height="12" rx="1.5" stroke="#6B35B8" strokeWidth="1.5" />
       <path d="M9 20h6" stroke="#6B35B8" strokeWidth="1.5" strokeLinecap="round" />
       <path d="m8.5 11 2 2 5-4.5" stroke="#6B35B8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function FeaturesAlignmentIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <circle cx="8" cy="9" r="3" stroke="#6B35B8" strokeWidth="1.5" />
-      <path d="M11 9h7M11 12h5M11 15h7" stroke="#6B35B8" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M14 6.5v5" stroke="#6B35B8" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -1368,13 +1356,6 @@ const FEATURES_NON_INTRUSIVE: FeatureInsight[] = [
     description:
       'An observation log lets users peek at exactly what Latch is tracking at any moment. In testing, seeing the log significantly increased confidence.',
   },
-  {
-    id: 'drag-it-anywhere',
-    icon: <FeaturesDragIcon />,
-    title: 'Drag it anywhere',
-    description:
-      "The overlay is fully draggable so it never blocks the content that matters. Users can position it wherever it's least intrusive.",
-  },
 ]
 
 const FEATURES_FLEXIBILITY_CONTROL: FeatureInsight[] = [
@@ -1384,13 +1365,6 @@ const FEATURES_FLEXIBILITY_CONTROL: FeatureInsight[] = [
     title: 'Review before committing',
     description:
       'Users needed to verify what the model captured before committing to automation.',
-  },
-  {
-    id: 'alignment-understanding',
-    icon: <FeaturesAlignmentIcon />,
-    title: 'Alignment of understanding and recording',
-    description:
-      "Users wanted to revisit recordings alongside the model's interpretation of their session.",
   },
   {
     id: 'edit-refine',
@@ -1510,7 +1484,7 @@ export default function LatchCaseStudy() {
   const statManual = useCountNumber(47, 1400, statsStarted)
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-[#F7F6F2] text-foreground antialiased">
+    <div className="relative min-h-screen overflow-x-visible bg-[#F7F6F2] text-foreground antialiased">
       <Helmet>
         <title>Latch — Superlabs | UX Case Study (In Progress) | Reshma Lokanathan</title>
         <meta name="description" content={latchDescription} />
@@ -1530,7 +1504,7 @@ export default function LatchCaseStudy() {
         {/* Hero */}
         <CaseStudySectionFrame>
         <section className="flex flex-col">
-          <div className="px-6 pb-14 pt-14 sm:px-8">
+          <div className={CASE_STUDY_SECTION_INNER_CLASS}>
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start lg:gap-10">
               <div className="min-w-0">
                 <HeroTagPill>Superlabs Inc</HeroTagPill>
@@ -1556,14 +1530,10 @@ export default function LatchCaseStudy() {
               </div>
             </div>
           </div>
-          {/* Meta strip — flush between page vertical guides (edge to edge of the rails) */}
+          {/* Meta strip — spans the content column between guide rails */}
           <div
             ref={statsRef}
-            className="relative left-1/2 grid grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border-t border-dotted border-[#b0b0a8] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-5"
-            style={{
-              width: `calc(100vw - ${HOME_GUIDE_SIDE_INSET_PX * 2}px)`,
-              transform: 'translateX(-50%)',
-            }}
+            className="relative grid w-full grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border-t border-dotted border-[#b0b0a8] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-5"
           >
             {(
               [
@@ -1597,14 +1567,14 @@ export default function LatchCaseStudy() {
 
         {/* 01 — Context */}
         <CaseStudySectionFrame>
-        <section className="px-6 py-14 sm:px-8">
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <SectionPill>01 • Context</SectionPill>
           <h2 className={`${sectionTitleClass} mt-4`}>
             Superlabs wants to let non-technical people automate their own work — without IT, without a
             developer.
           </h2>
 
-          <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,35%)_minmax(0,65%)] lg:items-start lg:gap-10">
+          <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,45.5%)] lg:items-start lg:gap-10">
             <div className="min-w-0">
               <p className={`${bodyClass} mt-0`}>
                 The way in: show the AI how you do it. It builds the automation.
@@ -1625,7 +1595,7 @@ export default function LatchCaseStudy() {
                 className="w-full"
                 imageSrc="/latch-joey-workflow-storyboard.png"
                 imageAlt="Eight-panel illustrated storyboard of Joey’s daily workflow: juggling SAP, Excel, CRM, PDF sign-off, report builder, colleague pings, fragmented tasks, and the desire for a better way."
-                imagePaddingClassName="p-10"
+                imagePaddingClassName="p-7"
               />
             </div>
           </div>
@@ -1643,7 +1613,7 @@ export default function LatchCaseStudy() {
 
         {/* 03 — Design Question */}
         <CaseStudySectionFrame>
-        <section className="px-6 py-14 sm:px-8">
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-6">
             <SectionPill>03 • Design Question</SectionPill>
             <div className="relative mt-10 flex flex-col gap-4 p-6 sm:gap-5 sm:p-8">
@@ -1663,7 +1633,7 @@ export default function LatchCaseStudy() {
 
         {/* 04 — Testing adoption signals */}
         <CaseStudySectionFrame>
-        <section className="px-6 py-14 sm:px-8">
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-6">
             <SectionPill>04 · Testing adoption signals</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>We built two working prototypes in Cursor and tested the extremes.</h2>
@@ -1737,7 +1707,7 @@ export default function LatchCaseStudy() {
 
         {/* 05 — Features */}
         <CaseStudySectionFrame>
-        <section className="px-6 py-14 sm:px-8">
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-6">
             <SectionPill>05 • FEATURES</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>Privacy</h2>
@@ -1756,19 +1726,20 @@ export default function LatchCaseStudy() {
               <article key={feature.id} className="flex min-w-0 flex-col gap-6">
                 <ImagePlaceholder
                   width="100%"
-                  height={304}
+                  height={280}
                   label={feature.label}
                   labelClassName="bg-white"
                   className="w-full shrink-0"
                   imageSrc={feature.imageSrc}
                   imageAlt={feature.imageAlt}
-                  imagePaddingClassName="p-[22px]"
+                  imagePaddingClassName="p-4 sm:p-5"
+                  imageClassName="max-h-[220px]"
                   centerImageInFrame
                 />
                 <div className="flex min-w-0 flex-col gap-4">
                   <div className={featureInsightIconRowClass}>
                     <span className="shrink-0">{feature.icon}</span>
-                    <h3 className={featureInsightTitleClass}>{feature.title}</h3>
+                    <h3 className={`m-0 min-w-0 ${featureInsightTitleClass}`}>{feature.title}</h3>
                   </div>
                   <p className={`mb-0 ${bodyClass}`}>{feature.description}</p>
                 </div>
@@ -1779,24 +1750,25 @@ export default function LatchCaseStudy() {
           <div className="mt-[80px] grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
             {FEATURE_COLUMNS.map((column) => (
               <div key={column.title} className="flex min-w-0 flex-col gap-6">
-                <h3 className={`m-0 ${sectionTitleClass}`}>{column.title}</h3>
+                <h3 className={`m-0 ${inDepthPanelTitleClass}`}>{column.title}</h3>
                 <ImagePlaceholder
                   width="100%"
-                  height={304}
+                  height={280}
                   label={column.imageLabel}
                   labelClassName="bg-white"
                   className="w-full shrink-0"
                   imageSrc={column.imageSrc}
                   imageAlt={column.imageAlt}
-                  imagePaddingClassName="p-[22px]"
+                  imagePaddingClassName="p-4 sm:p-5"
+                  imageClassName="max-h-[220px]"
                   centerImageInFrame
                 />
                 <div className="flex flex-col gap-8">
                   {column.features.map((feature) => (
-                    <div key={feature.id} className="flex min-w-0 flex-col gap-4">
+                    <div key={feature.id} className="flex min-w-0 flex-col gap-3">
                       <div className={featureInsightIconRowClass}>
                         <span className="shrink-0">{feature.icon}</span>
-                        <h4 className={`m-0 ${featureInsightTitleClass}`}>{feature.title}</h4>
+                        <h4 className={`m-0 min-w-0 ${featureInsightTitleClass}`}>{feature.title}</h4>
                       </div>
                       <p className={`mb-0 ${bodyClass}`}>{feature.description}</p>
                     </div>
@@ -1816,7 +1788,7 @@ export default function LatchCaseStudy() {
 
         {/* 07 — Agent Behaviour */}
         <CaseStudySectionFrame>
-        <section className="px-6 py-14 sm:px-8">
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-6">
             <SectionPill>07 • Agent Behaviour</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>Shaping Agent Behavior</h2>
@@ -1858,7 +1830,7 @@ export default function LatchCaseStudy() {
 
         {/* 08 — Responsible AI */}
         <CaseStudySectionFrame>
-        <section className="px-6 py-14 sm:px-8">
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-6">
             <SectionPill>08 • Responsible AI</SectionPill>
             <h2 className={`${sectionTitleClass} mt-4`}>Responsible AI (RAI) and risk mitigation</h2>

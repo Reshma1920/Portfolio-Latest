@@ -6,10 +6,25 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Default guide gutters — 90px below 1500px */
+    --guide-side-inset: 90px;
+  }
+
+  @media (min-width: 1500px) {
+    :root {
+      /* Large desktop only (≥1500px) */
+      --guide-side-inset: 210px;
+    }
+  }
+
   html {
     /* Room for fixed hero nav when scrolling to #home / #work */
     scroll-padding-top: calc(16px + 76px);
     @apply scroll-smooth antialiased;
+    /* Do not set overflow-x: hidden/clip here — it makes html a scroll container
+       and kills position: sticky (Latch/HDFC final-design stack). */
+    overscroll-behavior-x: none;
   }
 
   @media (min-width: 640px) {
@@ -20,6 +35,8 @@
 
   body {
     @apply m-0 min-h-svh bg-background text-foreground font-sans;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
   }
 
   #root {

@@ -1,11 +1,11 @@
 'use client'
 
 import {
-  HOME_GUIDE_SIDE_INSET_PX,
+  guideSideInsetPlus,
+  HOME_GUIDE_SIDE_INSET_VAR,
+  HOME_GUIDE_SIDE_PADDING_CLASS,
 } from '../case-studies/caseStudyLayout'
 import { SiteNav, SiteNavSpacer } from './SiteNav'
-
-const HERO_SIDE_INSET_PX = HOME_GUIDE_SIDE_INSET_PX
 const NAV_SPACER_PX = 57
 /** Distance from viewport bottom to the top rule of the footer meta band. */
 const HERO_BAND_TOP_FROM_BOTTOM_PX = 90
@@ -27,26 +27,26 @@ const labelClass =
  * - Footer band is split into small | long | small cells with black squares at every intersection
  */
 function HeroGuideFrame() {
-  const inset = HERO_SIDE_INSET_PX
+  const inset = HOME_GUIDE_SIDE_INSET_VAR
   const half = GUIDE_MARKER_PX / 2
   const topRule = NAV_SPACER_PX
   const bandTop = HERO_BAND_TOP_FROM_BOTTOM_PX
   const bandBottom = HERO_BAND_BOTTOM_FROM_BOTTOM_PX
   const sideCell = HERO_SIDE_CELL_PX
 
-  const markers: Array<{ left: number | string; top: number | string }> = [
+  const markers: Array<{ left: string; top: number | string }> = [
     // Top frame corners (below nav)
     { left: inset, top: topRule },
-    { left: `calc(100% - ${inset}px)`, top: topRule },
+    { left: `calc(100% - ${inset})`, top: topRule },
     // Footer band markers (left→right): bottom, top, top, bottom
-    { left: inset + sideCell, top: `calc(100% - ${bandTop}px)` },
-    { left: `calc(100% - ${inset + sideCell}px)`, top: `calc(100% - ${bandTop}px)` },
+    { left: guideSideInsetPlus(sideCell), top: `calc(100% - ${bandTop}px)` },
+    { left: `calc(100% - ${guideSideInsetPlus(sideCell)})`, top: `calc(100% - ${bandTop}px)` },
     { left: inset, top: `calc(100% - ${bandBottom}px)` },
-    { left: `calc(100% - ${inset}px)`, top: `calc(100% - ${bandBottom}px)` },
+    { left: `calc(100% - ${inset})`, top: `calc(100% - ${bandBottom}px)` },
   ]
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-[70]" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 z-[70] hidden lg:block" aria-hidden>
       {/* Top horizontal — full bleed */}
       <span
         className="absolute inset-x-0 h-px"
@@ -86,7 +86,7 @@ function HeroGuideFrame() {
       <span
         className="absolute w-px"
         style={{
-          left: inset + sideCell,
+          left: guideSideInsetPlus(sideCell),
           bottom: bandBottom,
           height: bandTop - bandBottom,
           backgroundColor: GUIDE_LINE,
@@ -96,7 +96,7 @@ function HeroGuideFrame() {
       <span
         className="absolute w-px"
         style={{
-          right: inset + sideCell,
+          right: guideSideInsetPlus(sideCell),
           bottom: bandBottom,
           height: bandTop - bandBottom,
           backgroundColor: GUIDE_LINE,
@@ -126,12 +126,12 @@ function HeroFooterBand() {
 
   return (
     <div
-      className="absolute inset-x-0 z-[15] flex items-center"
+      className="absolute inset-x-0 z-[15] hidden items-center lg:flex"
       style={{
         bottom: HERO_BAND_BOTTOM_FROM_BOTTOM_PX,
         height: bandHeight,
-        paddingLeft: HERO_SIDE_INSET_PX,
-        paddingRight: HERO_SIDE_INSET_PX,
+        paddingLeft: HOME_GUIDE_SIDE_INSET_VAR,
+        paddingRight: HOME_GUIDE_SIDE_INSET_VAR,
       }}
     >
       <p
@@ -165,12 +165,12 @@ export function CinematicHero() {
       <HeroFooterBand />
 
       <div
-        className="pointer-events-none absolute z-10 flex justify-center pb-[40px]"
+        className="pointer-events-none absolute z-10 hidden justify-center pb-[40px] lg:flex"
         style={{
           top: `${NAV_SPACER_PX}px`,
           bottom: `${HERO_BAND_TOP_FROM_BOTTOM_PX + 1}px`,
           left: 0,
-          width: `${HERO_SIDE_INSET_PX}px`,
+          width: HOME_GUIDE_SIDE_INSET_VAR,
         }}
         aria-hidden
       >
@@ -194,11 +194,7 @@ export function CinematicHero() {
           style={{ minHeight: heroContentMinHeight }}
         >
           <header
-            className="relative z-10 w-full text-center"
-            style={{
-              paddingLeft: `${HERO_SIDE_INSET_PX}px`,
-              paddingRight: `${HERO_SIDE_INSET_PX}px`,
-            }}
+            className={`relative z-10 w-full text-center ${HOME_GUIDE_SIDE_PADDING_CLASS}`}
           >
             <div className="flex flex-col items-center">
               <span className="animate-fade-rise inline-flex rounded-none bg-[rgba(107,53,184,0.12)] px-[11px] py-1.5 font-dmSans text-[15px] font-medium leading-none text-[#6B35B8]">

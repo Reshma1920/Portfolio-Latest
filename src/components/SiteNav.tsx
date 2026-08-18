@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { scrollToSectionId } from '../utils/scroll'
 import {
+  guideSideInsetPlus,
   HOME_GUIDE_MARKER_PX,
-  HOME_GUIDE_SIDE_INSET_PX,
 } from '../case-studies/caseStudyLayout'
 
 const RESUME_HREF = '/resume.pdf'
@@ -348,9 +348,9 @@ export function SiteNav({ variant }: SiteNavProps) {
       >
         <div
           style={{
-            // Match home: 40px breathing room inside the 90px guide verticals
-            paddingLeft: HOME_GUIDE_SIDE_INSET_PX + 40,
-            paddingRight: HOME_GUIDE_SIDE_INSET_PX + 40,
+            // Match home: 40px breathing room inside the guide verticals
+            paddingLeft: guideSideInsetPlus(40),
+            paddingRight: guideSideInsetPlus(40),
           }}
         >
           {navRow}

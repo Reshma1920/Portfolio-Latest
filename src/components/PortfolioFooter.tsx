@@ -1,9 +1,9 @@
 'use client'
 
 import { HeroPixelTorch } from './HeroPixelTorch'
+import { HOME_GUIDE_SIDE_PADDING_CLASS } from '../case-studies/caseStudyLayout'
 
 const HERO_IMAGE_SRC = '/Hero%20image.png'
-const FOOTER_SIDE_INSET_PX = 90
 
 export function PortfolioFooter() {
   return (
@@ -26,11 +26,7 @@ export function PortfolioFooter() {
           Fin.
         </p>
         <div
-          className="absolute inset-x-0 bottom-0 z-[3] flex items-baseline justify-between gap-6 pb-6 font-dmSans text-[14px] font-normal text-white"
-          style={{
-            paddingLeft: `${FOOTER_SIDE_INSET_PX}px`,
-            paddingRight: `${FOOTER_SIDE_INSET_PX}px`,
-          }}
+          className={`absolute inset-x-0 bottom-0 z-[3] flex items-baseline justify-between gap-6 pb-6 font-dmSans text-[14px] font-normal text-white ${HOME_GUIDE_SIDE_PADDING_CLASS}`}
         >
           <p>Reshma Lokanathan • 2026</p>
           <p className="shrink-0 text-right">Atlanta, GA</p>

@@ -2,9 +2,22 @@
 
 import { Helmet } from 'react-helmet-async'
 import { SiteNav, SiteNavSpacer } from '../components/SiteNav'
-import { caseStudyContainerClass, caseStudyMainClass, caseStudyPageOuterClass } from './caseStudyLayout'
+import {
+  CaseStudyGuideBreakOverlay,
+  CaseStudyPageDotGutters,
+  CaseStudyPageVerticals,
+  CaseStudySectionFrame,
+  CaseStudySectionGap,
+} from './CaseStudySectionFrame'
+import {
+  caseStudyContainerClass,
+  caseStudyMainClass,
+  caseStudyPageOuterClass,
+  CASE_STUDY_SECTION_INNER_CLASS,
+  HOME_GUIDE_MARKER_PX,
+} from './caseStudyLayout'
 import type { RefObject } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 /** L-shaped markers: 12px arm, 1.5px #000 — matches specification */
 function CornerMarkers() {
@@ -461,7 +474,7 @@ function TldrBentoSection() {
   ] as const
 
   return (
-    <section className="py-14">
+    <div className={CASE_STUDY_SECTION_INNER_CLASS}>
       <div className="mb-10">
         <SectionPill>02 · TL;DR</SectionPill>
         <h2 className={`${sectionTitleClass} mt-4`}>At a glance</h2>
@@ -570,7 +583,7 @@ function TldrBentoSection() {
         </div>
 
       </div>
-    </section>
+    </div>
   )
 }
 
@@ -644,45 +657,109 @@ const FINAL_DESIGN_BLOCKS: {
   },
 ]
 
-function FinalDesignsSection() {
-  const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [activeIdx, setActiveIdx] = useState(0)
-
-  useLayoutEffect(() => {
-    const nodes = FINAL_DESIGN_BLOCKS.map((_, i) => sectionRefs.current[i]).filter(
-      (n): n is HTMLDivElement => Boolean(n),
-    )
-    if (nodes.length === 0) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting && e.intersectionRatio > 0)
-        if (visible.length === 0) return
-        const top = visible.reduce((a, b) =>
-          a.intersectionRatio >= b.intersectionRatio ? a : b,
-        )
-        const idx = nodes.indexOf(top.target as HTMLDivElement)
-        if (idx >= 0) setActiveIdx(idx)
-      },
-      {
-        root: null,
-        rootMargin: '-12% 0px -38% 0px',
-        threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.65, 0.8, 1],
-      },
-    )
-
-    nodes.forEach((n) => observer.observe(n))
-    return () => observer.disconnect()
-  }, [])
-
-  const scrollToPanel = (i: number) => {
-    sectionRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+function FinalDesignCornerSquares() {
+  const half = HOME_GUIDE_MARKER_PX / 2
+  const mark = '#ffffff'
+  const baseStyle = {
+    width: HOME_GUIDE_MARKER_PX,
+    height: HOME_GUIDE_MARKER_PX,
+    backgroundColor: mark,
+  } as const
 
   return (
-    <section className="relative ml-[calc(50%-50vw)] w-screen max-w-[100vw] border-b border-solid border-[#e0e0e0] bg-[#050505] py-16 text-white sm:py-24">
+    <>
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, left: 0, top: 0, marginLeft: -half, marginTop: -half }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, right: 0, top: 0, marginRight: -half, marginTop: -half }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, left: 0, bottom: 0, marginLeft: -half, marginBottom: -half }}
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute z-[2]"
+        style={{ ...baseStyle, right: 0, bottom: 0, marginRight: -half, marginBottom: -half }}
+        aria-hidden
+      />
+    </>
+  )
+}
+
+const FINAL_DESIGN_SCROLL_OFFSET_PX = 120
+const FINAL_DESIGN_STICKY_TOP_PX = 120
+
+function FinalDesignsSection() {
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
+  const navItemRefs = useRef<(HTMLAnchorElement | null)[]>([])
+  const navRef = useRef<HTMLElement | null>(null)
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [indicator, setIndicator] = useState({ top: 0, height: 0 })
+
+  const scrollToPanel = useCallback((i: number) => {
+    const block = FINAL_DESIGN_BLOCKS[i]
+    if (!block) return
+    const el = document.getElementById(block.id)
+    if (!el) return
+    const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const top = window.scrollY + el.getBoundingClientRect().top - FINAL_DESIGN_SCROLL_OFFSET_PX
+    window.scrollTo({ top: Math.max(0, top), behavior: prefersReduce ? 'auto' : 'smooth' })
+    setActiveIdx(i)
+    window.history.replaceState(null, '', `#${block.id}`)
+  }, [])
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1)
+    if (!hash) return
+    const idx = FINAL_DESIGN_BLOCKS.findIndex((block) => block.id === hash)
+    if (idx < 0) return
+    requestAnimationFrame(() => scrollToPanel(idx))
+  }, [scrollToPanel])
+
+  useEffect(() => {
+    const updateActive = () => {
+      const nodes = sectionRefs.current.filter(Boolean) as HTMLDivElement[]
+      if (nodes.length === 0) return
+      let next = 0
+      for (let i = 0; i < nodes.length; i += 1) {
+        const top = nodes[i].getBoundingClientRect().top
+        if (top <= FINAL_DESIGN_STICKY_TOP_PX + 24) next = i
+      }
+      setActiveIdx((prev) => (prev === next ? prev : next))
+    }
+    updateActive()
+    window.addEventListener('scroll', updateActive, { passive: true })
+    window.addEventListener('resize', updateActive)
+    return () => {
+      window.removeEventListener('scroll', updateActive)
+      window.removeEventListener('resize', updateActive)
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    const updateIndicator = () => {
+      const item = navItemRefs.current[activeIdx]
+      if (!item || !navRef.current) return
+      setIndicator({ top: item.offsetTop, height: item.offsetHeight })
+    }
+    updateIndicator()
+    window.addEventListener('resize', updateIndicator)
+    return () => window.removeEventListener('resize', updateIndicator)
+  }, [activeIdx])
+
+  return (
+    <section
+      data-break-page-verticals=""
+      className="relative z-[2] -ml-5 w-[calc(100%+2.5rem)] bg-[#050505] py-16 text-white sm:-ml-8 sm:w-[calc(100%+4rem)] sm:py-24 md:-ml-[calc(var(--guide-side-inset)+2.5rem)] md:w-[calc(100%+2*var(--guide-side-inset)+5rem)]"
+    >
       <div className={caseStudyContainerClass}>
-        <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
+        <div className="grid gap-14 p-8 sm:p-10 lg:grid-cols-12 lg:items-start lg:gap-12 xl:gap-16">
           <aside className="lg:sticky lg:top-[140px] lg:col-span-4 lg:self-start">
             <span className="inline-block border border-white/20 bg-white/[0.06] px-2.5 py-1 font-sans text-[11px] font-medium uppercase tracking-[0.14em] text-white/75 sm:text-[12px]">
               12 · Final designs
@@ -694,25 +771,42 @@ function FinalDesignsSection() {
               Shipped flows for project discovery, disbursement requests, and construction
               progress—readable and actionable for developers, analysts, and borrowers.
             </p>
-            <nav className="mt-10 flex flex-col gap-0.5" aria-label="Jump to final design">
+            <nav
+              ref={navRef}
+              className="relative mt-10 flex flex-col gap-0.5"
+              aria-label="Jump to final design"
+            >
+              <span
+                className="pointer-events-none absolute left-0 w-0.5 bg-white transition-[transform,height] duration-300 ease-out"
+                style={{
+                  height: indicator.height || 0,
+                  transform: `translateY(${indicator.top}px)`,
+                }}
+                aria-hidden
+              />
               {FINAL_DESIGN_BLOCKS.map((block, i) => (
-                <button
+                <a
                   key={block.id}
-                  type="button"
-                  onClick={() => scrollToPanel(i)}
-                  className={`border-l-2 py-2.5 pl-4 text-left font-dmSans text-[15px] font-medium transition-colors sm:text-[16px] ${
-                    activeIdx === i
-                      ? 'border-white text-white'
-                      : 'border-transparent text-white/45 hover:text-white/75'
+                  ref={(el) => {
+                    navItemRefs.current[i] = el
+                  }}
+                  href={`#${block.id}`}
+                  aria-current={activeIdx === i ? 'true' : undefined}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    scrollToPanel(i)
+                  }}
+                  className={`border-l-2 border-transparent py-2.5 pl-4 text-left font-dmSans text-[15px] font-medium transition-colors sm:text-[16px] ${
+                    activeIdx === i ? 'text-white' : 'text-white/45 hover:text-white/75'
                   }`}
                 >
                   {block.navLabel}
-                </button>
+                </a>
               ))}
             </nav>
           </aside>
 
-          <div className="flex flex-col gap-20 sm:gap-24 md:gap-28 lg:col-span-8">
+          <div className="relative flex flex-col gap-8 overflow-visible lg:col-span-8 lg:gap-0 lg:pt-[52px]">
             {FINAL_DESIGN_BLOCKS.map((block, i) => (
               <div
                 key={block.id}
@@ -720,25 +814,20 @@ function FinalDesignsSection() {
                 ref={(el) => {
                   sectionRefs.current[i] = el
                 }}
-                className="scroll-mt-[100px] md:scroll-mt-[108px]"
+                className="relative scroll-mt-[100px] border border-solid border-white/25 bg-[#050505] p-6 sm:p-8 md:scroll-mt-[120px] lg:sticky lg:-mb-px lg:scroll-mt-[120px]"
+                style={{ top: FINAL_DESIGN_STICKY_TOP_PX, zIndex: i + 1 }}
               >
-                <div className="relative">
-                  {block.imageSrc != null && block.imageAlt != null ? (
-                    <FinalDesignFrame
-                      src={block.imageSrc}
-                      alt={block.imageAlt}
-                      height={block.h}
-                      className="w-full"
-                    />
-                  ) : (
-                    <ImagePlaceholder
-                      width={1100}
-                      height={block.h}
-                      className="w-full"
-                      variant="dark"
-                    />
-                  )}
-                </div>
+                <FinalDesignCornerSquares />
+                {block.imageSrc != null && block.imageAlt != null ? (
+                  <FinalDesignFrame
+                    src={block.imageSrc}
+                    alt={block.imageAlt}
+                    height={block.h}
+                    className="w-full"
+                  />
+                ) : (
+                  <ImagePlaceholder width={1100} height={block.h} className="w-full" variant="dark" />
+                )}
                 <h3 className="mt-6 font-dmSans text-[18px] font-semibold leading-snug tracking-tight text-white">
                   {block.title}
                 </h3>
@@ -759,7 +848,7 @@ const hdfcDescription =
 
 export default function HDFCCaseStudy() {
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#F7F6F2] text-foreground antialiased">
+    <div className="relative min-h-screen overflow-x-visible bg-[#F7F6F2] text-foreground antialiased">
       <Helmet>
         <title>HDFC Bank — Enterprise Loan Management Platform | Reshma Lokanathan</title>
         <meta name="description" content={hdfcDescription} />
@@ -769,36 +858,70 @@ export default function HDFCCaseStudy() {
         <meta property="og:type" content="website" />
       </Helmet>
       <SiteNav variant="case-study" />
+      <CaseStudyPageDotGutters />
+      <CaseStudyPageVerticals />
+      <CaseStudyGuideBreakOverlay />
       <SiteNavSpacer />
 
       <div className={caseStudyPageOuterClass}>
-      <main className={caseStudyMainClass}>
+        <main className={`${caseStudyMainClass} flex flex-col`}>
 
-        {/* 01 */}
-        <section className="border-y border-solid border-[#e0e0e0] py-14">
-          <div className="mb-12 flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
-            <div className="min-w-0 flex-1">
-              <p className="font-dmSans text-[13px] font-medium uppercase tracking-wide text-[#555]">
-                HDFC Bank · Lead Product Designer
-              </p>
-              <h1 className="mt-6 max-w-xl font-dmSans text-[48px] font-semibold leading-[1.1] text-black">
-                Enterprise Loan Management Platform for India&apos;s Largest Private Bank
-              </h1>
+        <CaseStudySectionFrame>
+        <section className="flex flex-col">
+          <div className={CASE_STUDY_SECTION_INNER_CLASS}>
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+              <div className="min-w-0 flex-1">
+                <p className="font-dmSans text-[13px] font-medium uppercase tracking-wide text-[#555]">
+                  HDFC Bank · Lead Product Designer
+                </p>
+                <h1 className="mt-6 max-w-xl font-dmSans text-[48px] font-semibold leading-[1.1] text-black">
+                  Enterprise Loan Management Platform for India&apos;s Largest Private Bank
+                </h1>
+              </div>
+              <ImagePlaceholder
+                width={600}
+                height={400}
+                className="w-full lg:mt-14"
+                videoSrc="/HDFC%20Video%20.mp4"
+              />
             </div>
-            <ImagePlaceholder
-              width={600}
-              height={400}
-              className="w-full lg:mt-14"
-              videoSrc="/HDFC%20Video%20.mp4"
-            />
+          </div>
+          <div
+            className="relative grid w-full grid-cols-1 divide-y divide-dotted divide-[#b0b0a8] border-t border-dotted border-[#b0b0a8] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-5"
+          >
+            {(
+              [
+                ['Company', 'HDFC Bank'],
+                ['Product', 'Loan Management Platform'],
+                ['My role', 'Lead Product Designer'],
+                ['Team', '4 (Design, Research, PM)'],
+                ['Status', 'Shipped • 2024'],
+              ] as const
+            ).map(([k, v]) => (
+              <div key={k} className="min-w-0 bg-[#fdfcfa] px-4 py-5 sm:px-5 sm:py-6">
+                <p className="m-0 font-dmSans text-[12px] font-semibold uppercase tracking-wide text-[#555] sm:text-[13px]">
+                  {k}
+                </p>
+                <p className="mt-2 mb-0 font-dmSans text-[14px] leading-snug text-black sm:text-[15px]">
+                  {v}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
+        </CaseStudySectionFrame>
 
-        {/* 02 · TL;DR bento */}
+        <CaseStudySectionGap />
+
+        <CaseStudySectionFrame>
         <TldrBentoSection />
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 03 — CONTEXT */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-10">
             <SectionPill>03 · CONTEXT</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>
@@ -811,10 +934,6 @@ export default function HDFCCaseStudy() {
             </p>
           </div>
           <div className="relative">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
-            />
             <div className="grid gap-12 lg:grid-cols-2">
               <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
                 <h3 className="font-dmSans text-[22px] font-semibold text-black">
@@ -837,15 +956,15 @@ export default function HDFCCaseStudy() {
                 </p>
               </div>
             </div>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
-            />
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 04 — PROBLEM */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-4">
             <SectionPill>04 · PROBLEM</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>
@@ -913,9 +1032,13 @@ export default function HDFCCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 05 — RESEARCH */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-4">
             <SectionPill>05 · RESEARCH</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>Six Cities, One Pattern</h2>
@@ -963,17 +1086,17 @@ export default function HDFCCaseStudy() {
             ))}
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 06 — MARKET */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-4">
             <h2 className={sectionTitleClass}>Market Research</h2>
           </div>
           <div className="relative">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
-            />
             <div className="grid gap-12 lg:grid-cols-2">
               <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
                 <h3 className="font-dmSans text-[22px] font-semibold text-black">
@@ -1000,15 +1123,15 @@ export default function HDFCCaseStudy() {
                 </ul>
               </div>
             </div>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
-            />
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 07 — GAPS */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-12">
             <div className="min-w-0">
               <h2 className={sectionTitleClass}>Gaps &amp; Opportunities</h2>
@@ -1038,9 +1161,13 @@ export default function HDFCCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 08 — STAKEHOLDERS */}
-        <section className="border-b border-solid border-[#e0e0e0] py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-4">
             <SectionPill>08 · ALIGNMENT</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>
@@ -1129,9 +1256,13 @@ export default function HDFCCaseStudy() {
             </table>
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 09 — WORKFLOW */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-10">
             <SectionPill>09 · IDEATION</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>Proposed workflow</h2>
@@ -1220,9 +1351,13 @@ export default function HDFCCaseStudy() {
             ))}
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 10 — PROCESS (Collaborative IA) */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <h2 className={sectionTitleClass}>
             Co-creating Information Architecture with Stakeholders
           </h2>
@@ -1252,9 +1387,13 @@ export default function HDFCCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         {/* 11 — PHILOSOPHY */}
-        <section className="py-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-10">
             <h2 className={sectionTitleClass}>Design Philosophy</h2>
           </div>
@@ -1288,20 +1427,22 @@ export default function HDFCCaseStudy() {
             </div>
           </div>
         </section>
+        </CaseStudySectionFrame>
+
+        <CaseStudySectionGap />
 
         <FinalDesignsSection />
 
+        <CaseStudySectionGap />
+
         {/* 13 — Outcomes & learnings */}
-        <section className="pb-14 pt-14">
+        <CaseStudySectionFrame>
+        <section className={CASE_STUDY_SECTION_INNER_CLASS}>
           <div className="mb-12">
             <SectionPill>13 · Outcomes &amp; learnings</SectionPill>
             <h2 className={`${sectionTitleClass} mt-3`}>Outcomes &amp; learnings</h2>
           </div>
           <div className="relative">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
-            />
             <div className="grid gap-12 lg:grid-cols-3">
               <div className="relative border border-solid border-[#e0e0e0] bg-[#fdfcfa] p-8">
                 <h3 className="font-dmSans text-[22px] font-semibold text-black">
@@ -1334,13 +1475,10 @@ export default function HDFCCaseStudy() {
                 </p>
               </div>
             </div>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px max-w-[100vw] w-screen -translate-x-1/2 bg-[#e0e0e0]"
-            />
           </div>
           <SectionDivider />
         </section>
+        </CaseStudySectionFrame>
       </main>
       </div>
     </div>
