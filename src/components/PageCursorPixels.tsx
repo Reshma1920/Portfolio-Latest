@@ -271,8 +271,7 @@ export function PageCursorPixels() {
     <canvas
       ref={canvasRef}
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[1] block border-0 outline-none"
-      style={{ width: '100vw', height: '100vh' }}
+      className="pointer-events-none fixed inset-0 z-[1] block h-full w-full border-0 outline-none"
     />
   )
 }

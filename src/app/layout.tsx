@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '../index.css'
 import { Analytics } from '@vercel/analytics/react'
+import { LockHorizontalScroll } from '../components/LockHorizontalScroll'
 import { PortfolioFooter } from '../components/PortfolioFooter'
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <LockHorizontalScroll />
         {children}
         <PortfolioFooter />
         <Analytics />

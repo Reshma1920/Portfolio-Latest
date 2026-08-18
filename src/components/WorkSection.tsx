@@ -7,6 +7,7 @@ import {
   HOME_GUIDE_LINE,
   HOME_GUIDE_MARKER_PX,
   HOME_GUIDE_SIDE_FLUSH_CLASS,
+  HOME_GUIDE_SIDE_INSET_VAR,
   HOME_GUIDE_SIDE_PADDING_CLASS,
 } from '../case-studies/caseStudyLayout'
 
@@ -320,6 +321,7 @@ function ProjectCard({
               <video
                 ref={videoRef}
                 src={mediaVideoSrc}
+                preload="metadata"
                 className="block h-full w-full object-cover object-center [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
                 muted
                 loop
@@ -396,7 +398,18 @@ export function WorkSection() {
       </div>
 
       <div className="relative w-full pb-[80px]">
-        {/* Cards flush to guide rails — card borders are the vertical lines (no duplicate rails) */}
+        {/* Continuous outer verticals connecting all three cards */}
+        <div className="pointer-events-none absolute inset-0 z-[10] hidden lg:block" aria-hidden>
+          <span
+            className="absolute inset-y-0 w-px"
+            style={{ left: HOME_GUIDE_SIDE_INSET_VAR, backgroundColor: HOME_GUIDE_LINE }}
+          />
+          <span
+            className="absolute inset-y-0 w-px"
+            style={{ right: HOME_GUIDE_SIDE_INSET_VAR, backgroundColor: HOME_GUIDE_LINE }}
+          />
+        </div>
+
         <div className={`relative z-[20] flex w-full flex-col gap-[142px] ${HOME_GUIDE_SIDE_FLUSH_CLASS}`}>
             <WorkCardGuideFrame>
               <Link

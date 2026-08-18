@@ -247,7 +247,7 @@ function ImagePlaceholder({
             controls
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             className={
               videoClassName
                 ? `max-h-full max-w-full shrink-0 object-contain ${videoClassName}`

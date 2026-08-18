@@ -21,7 +21,7 @@ export const HOME_GUIDE_SIDE_FLUSH_CLASS =
 export const guideSideInsetPlus = (px: number) =>
   px === 0 ? HOME_GUIDE_SIDE_INSET_VAR : `calc(${HOME_GUIDE_SIDE_INSET_VAR} + ${px}px)`
 
-export const guideContentWidthBetweenRails = `calc(100vw - 2 * ${HOME_GUIDE_SIDE_INSET_VAR})`
+export const guideContentWidthBetweenRails = `calc(100% - 2 * ${HOME_GUIDE_SIDE_INSET_VAR})`
 
 /** Horizontal breathing room inside the guide rails. */
 export const CASE_STUDY_CONTENT_GUTTER_CLASS = 'px-5 sm:px-8 lg:px-10'
@@ -49,10 +49,10 @@ export const PAGE_SHELL_INNER_PADDING_CLASS = 'px-[40px]'
 export const pageShellInnerClass = `mx-auto w-full ${PAGE_SHELL_MAX_WIDTH_CLASS} ${PAGE_SHELL_INNER_PADDING_CLASS}`
 
 /** Inner content column for dark full-bleed bands — stays between guide rails. */
-export const caseStudyContainerClass = `mx-[var(--guide-side-inset)] w-[calc(100vw-2*var(--guide-side-inset))] max-w-[calc(100vw-2*var(--guide-side-inset))] px-5 sm:px-8 md:px-10`
+export const caseStudyContainerClass = `mx-[var(--guide-side-inset)] w-[calc(100%-2*var(--guide-side-inset))] max-w-[calc(100%-2*var(--guide-side-inset))] px-5 sm:px-8 md:px-10`
 
 /** Full-width gutter around case study main column — no extra px; guides define rhythm. */
 export const caseStudyPageOuterClass = 'px-0'
 
 /** Case study body: pinned between guide verticals from md+ (90px inset; 210px at 1500px+). */
-export const caseStudyMainClass = `w-full pb-28 px-5 sm:px-8 md:mx-[var(--guide-side-inset)] md:w-[calc(100vw-2*var(--guide-side-inset))] md:max-w-[calc(100vw-2*var(--guide-side-inset))] md:px-10`
+export const caseStudyMainClass = `w-full pb-28 px-5 sm:px-8 md:mx-[var(--guide-side-inset)] md:w-[calc(100%-2*var(--guide-side-inset))] md:max-w-[calc(100%-2*var(--guide-side-inset))] md:px-10`

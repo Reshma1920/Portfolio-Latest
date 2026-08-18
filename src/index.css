@@ -22,9 +22,10 @@
     /* Room for fixed hero nav when scrolling to #home / #work */
     scroll-padding-top: calc(16px + 76px);
     @apply scroll-smooth antialiased;
-    /* Do not set overflow-x: hidden/clip here — it makes html a scroll container
-       and kills position: sticky (Latch/HDFC final-design stack). */
+    /* clip does not create a scroll container (unlike hidden), so sticky stacks stay intact. */
+    overflow-x: clip;
     overscroll-behavior-x: none;
+    touch-action: pan-y pinch-zoom;
   }
 
   @media (min-width: 640px) {
@@ -34,9 +35,10 @@
   }
 
   body {
-    @apply m-0 min-h-svh bg-background text-foreground font-sans;
+    @apply m-0 min-h-svh max-w-full bg-background text-foreground font-sans;
+    overflow-x: clip;
     overscroll-behavior-x: none;
-    touch-action: pan-y;
+    touch-action: pan-y pinch-zoom;
   }
 
   #root {

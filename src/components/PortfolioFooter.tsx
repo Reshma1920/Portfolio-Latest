@@ -8,8 +8,7 @@ const HERO_IMAGE_SRC = '/Hero%20image.png'
 export function PortfolioFooter() {
   return (
     <footer
-      className="relative z-10 w-screen max-w-none"
-      style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
+      className="relative z-10 w-full max-w-full"
       aria-label="Site footer"
     >
       <div className="relative">
