@@ -43,6 +43,10 @@ type Props = {
   src: string
   alt?: string
   className?: string
+  /** When true, sky band stays page background — only mountains/trees are pixelated. */
+  mountainsOnly?: boolean
+  /** Cursor trail + glyph reveal (footer). Off for decorative hero backgrounds. */
+  interactive?: boolean
 }
 
 function drawCover(
@@ -174,7 +178,13 @@ function glyphIndex(
   return finalIdx
 }
 
-export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
+export function HeroPixelTorch({
+  src,
+  alt = '',
+  className = '',
+  mountainsOnly = false,
+  interactive = true,
+}: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -438,6 +448,10 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
         for (let i = 0; i < cols; i++) {
           const x = offsetX + i * STRIDE
           const y = offsetY + j * STRIDE
+          if (mountainsOnly && isSky[idx]) {
+            idx++
+            continue
+          }
           drawPixelCell(ctx, x, y, baseR[idx]!, baseG[idx]!, baseB[idx]!)
           idx++
         }
@@ -455,7 +469,7 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
       const t = frame * SYCAMORE.timeScale
       const wWave = globalWave(t)
       const now = performance.now()
-      updateTwinkles(now)
+      if (interactive) updateTwinkles(now)
 
       ctx.fillStyle = bgFill
       ctx.fillRect(0, 0, w, h)
@@ -466,22 +480,27 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
           const x = offsetX + i * STRIDE
           const y = offsetY + j * STRIDE
 
+          if (mountainsOnly && isSky[idx]) {
+            idx++
+            continue
+          }
+
           const cx = x + CELL / 2
           const cy = y + CELL / 2
           const br = baseBr[idx]!
           const sw = cellSwirl(t, i, j)
 
           const inCursorReveal =
-            pointerActive && isCursorZone(cx, cy, cursorX, cursorY)
+            interactive && pointerActive && isCursorZone(cx, cy, cursorX, cursorY)
 
-          const interactive = canInteract(idx)
-          const ti = trailInfluence(cx, cy, trail)
-          const act = interactive && br < actThresholdAdj + sw
+          const canUse = canInteract(idx)
+          const ti = interactive ? trailInfluence(cx, cy, trail) : 0
+          const act = canUse && br < actThresholdAdj + sw
           const threshold =
             SYCAMORE.baseThreshold + wWave + sw + ti * SYCAMORE.trailInfluence
-          const sm = !interactive || !(br < threshold)
+          const sm = !canUse || !(br < threshold)
 
-          if (inCursorReveal && interactive) {
+          if (inCursorReveal && canUse) {
             drawPixelCell(ctx, x, y, baseR[idx]!, baseG[idx]!, baseB[idx]!)
             if (shouldDrawGlyph(idx, ti, act, sm)) {
               const gi = glyphIndex(
@@ -503,7 +522,7 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
           let g = baseG[idx]!
           let b = baseB[idx]!
 
-          const boost = interactive ? twinkleBoostFor(idx, now) : 0
+          const boost = interactive && canUse ? twinkleBoostFor(idx, now) : 0
           if (boost > 0) {
             r = clamp255(r + boost)
             g = clamp255(g + boost)
@@ -512,7 +531,7 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
 
           drawPixelCell(ctx, x, y, r, g, b)
 
-          if (pointerActive && shouldDrawGlyph(idx, ti, act, sm)) {
+          if (interactive && pointerActive && shouldDrawGlyph(idx, ti, act, sm)) {
             const gi = glyphIndex(
               frame,
               i,
@@ -534,8 +553,8 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
 
     function tick(now: number) {
       if (!reducedMotion && visible && ready) {
-        const twinkling = activeTwinkles.size > 0
-        if (pointerActive || twinkling || now - lastDraw >= frameInterval) {
+        const twinkling = interactive && activeTwinkles.size > 0
+        if (interactive && (pointerActive || twinkling || now - lastDraw >= frameInterval)) {
           drawFrame()
           lastDraw = now
         }
@@ -546,6 +565,10 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
     function startLoop() {
       cancelAnimationFrame(raf)
       lastDraw = 0
+      if (!interactive) {
+        if (ready) drawFrameStatic()
+        return
+      }
       raf = requestAnimationFrame(tick)
       if (!reducedMotion) drawFrame()
     }
@@ -585,20 +608,24 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
 
     function onImageReady() {
       if (!sampleFromImage()) return
-      if (reducedMotion) {
+      if (reducedMotion || !interactive) {
         drawFrameStatic()
         return
       }
       startLoop()
     }
 
-    canvas.addEventListener('pointermove', onPointerMove)
-    canvas.addEventListener('pointerenter', onPointerMove)
-    canvas.addEventListener('pointerleave', onPointerLeave)
+    if (interactive) {
+      canvas.addEventListener('pointermove', onPointerMove)
+      canvas.addEventListener('pointerenter', onPointerMove)
+      canvas.addEventListener('pointerleave', onPointerLeave)
+    }
 
     const ro = new ResizeObserver(() => {
       requestAnimationFrame(() => {
-        if (sampleFromImage()) drawFrame()
+        if (!sampleFromImage()) return
+        if (interactive && !reducedMotion) drawFrame()
+        else drawFrameStatic()
       })
     })
     ro.observe(wrap)
@@ -622,15 +649,20 @@ export function HeroPixelTorch({ src, alt = '', className = '' }: Props) {
       ro.disconnect()
       io.disconnect()
       loader.removeEventListener('load', onImageReady)
-      canvas.removeEventListener('pointermove', onPointerMove)
-      canvas.removeEventListener('pointerenter', onPointerMove)
-      canvas.removeEventListener('pointerleave', onPointerLeave)
+      if (interactive) {
+        canvas.removeEventListener('pointermove', onPointerMove)
+        canvas.removeEventListener('pointerenter', onPointerMove)
+        canvas.removeEventListener('pointerleave', onPointerLeave)
+      }
     }
-  }, [src])
+  }, [src, mountainsOnly, interactive])
 
   return (
     <div ref={wrapRef} className={`relative overflow-hidden border-0 bg-[#F7F6F2] outline-none ${className}`}>
-      <canvas ref={canvasRef} className="block h-full w-full touch-none border-0 outline-none" />
+      <canvas
+        ref={canvasRef}
+        className={`block h-full w-full border-0 outline-none ${interactive ? 'touch-none' : 'pointer-events-none'}`}
+      />
       {alt ? <span className="sr-only">{alt}</span> : null}
     </div>
   )

@@ -6,7 +6,7 @@ function prefersReducedMotion(): boolean {
 }
 
 /** Smooth in-page navigation; respects prefers-reduced-motion. */
-export function scrollToSectionId(id: 'home' | 'work'): void {
+export function scrollToSectionId(id: 'home' | 'work' | 'about'): void {
   const el = document.getElementById(id)
   const behavior = prefersReducedMotion() ? ('auto' as const) : ('smooth' as const)
   el?.scrollIntoView({ behavior, block: 'start' })

@@ -20,3 +20,45 @@
 .animate-fade-rise-delay-2 {
   animation: fade-rise 0.8s ease-out 0.4s both;
 }
+
+@keyframes loader-symbol-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes loader-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.loader-symbol {
+  opacity: 0;
+  will-change: opacity, transform;
+  animation: loader-symbol-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.loader-overlay {
+  will-change: opacity;
+  animation: loader-overlay-out 0.25s ease-out 1.25s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-symbol {
+    opacity: 1;
+    animation: none;
+  }
+
+  .loader-overlay {
+    animation: none;
+  }
+}

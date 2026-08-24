@@ -9,6 +9,8 @@ const STRIDE = CELL + GAP
 const MAX_ALPHA = 0.08
 const CLUSTER_BASE = 70
 const CLUSTER_WOBBLE = 14
+/** Solid black square centered on the cursor tip. */
+const CURSOR_SQUARE = 6
 
 const HEAD_SMOOTH = 0.14
 const TRAIL_SPACING = 11
@@ -169,38 +171,45 @@ export function PageCursorPixels() {
         centers.push({ x: smoothX, y: smoothY, strength: idle * (moving ? 1 : 0.75) })
       }
 
-      if (centers.length === 0) return
+      if (centers.length > 0) {
+        let minGX = Infinity
+        let maxGX = -Infinity
+        let minGY = Infinity
+        let maxGY = -Infinity
 
-      let minGX = Infinity
-      let maxGX = -Infinity
-      let minGY = Infinity
-      let maxGY = -Infinity
+        for (const c of centers) {
+          minGX = Math.min(minGX, Math.floor((c.x - maxRadius) / STRIDE))
+          maxGX = Math.max(maxGX, Math.ceil((c.x + maxRadius) / STRIDE))
+          minGY = Math.min(minGY, Math.floor((c.y - maxRadius) / STRIDE))
+          maxGY = Math.max(maxGY, Math.ceil((c.y + maxRadius) / STRIDE))
+        }
 
-      for (const c of centers) {
-        minGX = Math.min(minGX, Math.floor((c.x - maxRadius) / STRIDE))
-        maxGX = Math.max(maxGX, Math.ceil((c.x + maxRadius) / STRIDE))
-        minGY = Math.min(minGY, Math.floor((c.y - maxRadius) / STRIDE))
-        maxGY = Math.max(maxGY, Math.ceil((c.y + maxRadius) / STRIDE))
+        for (let gy = minGY; gy <= maxGY; gy++) {
+          for (let gx = minGX; gx <= maxGX; gx++) {
+            const x = gx * STRIDE
+            const y = gy * STRIDE
+            if (x + CELL < 0 || y + CELL < 0 || x > w || y > h) continue
+
+            let alpha = 0
+            for (const c of centers) {
+              alpha = Math.max(
+                alpha,
+                cellAlphaAt(gx, gy, c.x, c.y, c.strength),
+              )
+            }
+
+            if (alpha < 0.01) continue
+            ctx.fillStyle = `rgba(0,0,0,${alpha})`
+            ctx.fillRect(x, y, CELL, CELL)
+          }
+        }
       }
 
-      for (let gy = minGY; gy <= maxGY; gy++) {
-        for (let gx = minGX; gx <= maxGX; gx++) {
-          const x = gx * STRIDE
-          const y = gy * STRIDE
-          if (x + CELL < 0 || y + CELL < 0 || x > w || y > h) continue
-
-          let alpha = 0
-          for (const c of centers) {
-            alpha = Math.max(
-              alpha,
-              cellAlphaAt(gx, gy, c.x, c.y, c.strength),
-            )
-          }
-
-          if (alpha < 0.01) continue
-          ctx.fillStyle = `rgba(0,0,0,${alpha})`
-          ctx.fillRect(x, y, CELL, CELL)
-        }
+      // Solid black square at the cursor tip — pixel trail unchanged
+      if (hasPointer && idle > 0.001 && smoothX > -1e8) {
+        const half = CURSOR_SQUARE / 2
+        ctx.fillStyle = `rgba(0,0,0,${idle})`
+        ctx.fillRect(smoothX - half, smoothY - half, CURSOR_SQUARE, CURSOR_SQUARE)
       }
     }
 

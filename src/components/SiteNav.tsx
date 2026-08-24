@@ -1,6 +1,6 @@
 'use client'
 
-import type { MouseEvent, ReactNode } from 'react'
+import type { MouseEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -10,26 +10,106 @@ import {
   HOME_GUIDE_MARKER_PX,
 } from '../case-studies/caseStudyLayout'
 
-const RESUME_HREF = '/resume.pdf'
+const RESUME_HREF =
+  'https://drive.google.com/file/d/16ARJFqU-a44qndQp50JnsGTM_xprohdS/view?usp=sharing'
+const LINKEDIN_HREF = 'https://www.linkedin.com/in/reshma-lokanathan19/'
+const LETS_TALK_HREF = 'mailto:reshma.lokanathan19@gmail.com'
 
-const navLinkClass =
-  'text-sm text-muted transition-colors duration-300 ease-out hover:text-foreground motion-reduce:transition-none'
-const navLinkActiveClass =
-  'text-sm text-foreground transition-colors duration-300 ease-out motion-reduce:transition-none'
+const navIconButtonClass =
+  'inline-flex shrink-0 items-center justify-center rounded-none border border-solid border-[#e0e0e0] bg-white p-[7px] text-[#919191] transition-[border-radius,border-color,color] duration-300 ease-out hover:rounded-xl hover:border-black/30 hover:text-[#333333] motion-reduce:transition-none'
 
-/** Solid bar — always opaque so content never shows through while scrolling */
-const navBarSurfaceClass = 'bg-[#F7F6F2]'
+const NAV_INACTIVE = '#919191'
+const NAV_TRACK = '#D6D6D6'
+/** Viewport probe ratio — which point in the window picks the active section / short-section progress. */
+const SECTION_PROBE_RATIO = 0.35
 
-function computeWorkSectionActive(work: HTMLElement): boolean {
-  const r = work.getBoundingClientRect()
-  const vh = window.innerHeight
-  const enter = r.top < vh * 0.5 && r.bottom > vh * 0.18
-  return enter
+type NavSection = 'home' | 'work' | 'about'
+
+type SectionNavState = {
+  activeSection: NavSection
+  homeProgress: number
+  workProgress: number
+  aboutProgress: number
+  /** Hero default = transparent nav; scrolled = bg + border (Figma “Scrol” variant). */
+  navDocked: boolean
+}
+
+function clamp01(value: number): number {
+  return Math.min(1, Math.max(0, value))
+}
+
+function sectionBounds(el: HTMLElement) {
+  const rect = el.getBoundingClientRect()
+  const top = rect.top + window.scrollY
+  return { top, bottom: top + rect.height, height: rect.height }
+}
+
+/** Map viewport probe position to 0→1 across a section (aligned with active-section handoff). */
+function progressFromProbe(probe: number, start: number, end: number): number {
+  const span = end - start
+  if (span <= 0) return 0
+  return clamp01((probe - start) / span)
+}
+
+function resolveActiveSection(
+  probe: number,
+  workTop: number,
+  aboutTop: number | undefined,
+): NavSection {
+  if (aboutTop != null && probe >= aboutTop) return 'about'
+  if (probe >= workTop) return 'work'
+  return 'home'
+}
+
+function computeSectionNavState(isLandingHome: boolean): SectionNavState {
+  const scrollY = window.scrollY
+  const viewportHeight = window.innerHeight
+  const probe = scrollY + viewportHeight * SECTION_PROBE_RATIO
+  const navDocked = !isLandingHome || scrollY > 8
+
+  const home = document.getElementById('home')
+  const work = document.getElementById('work')
+  const about = document.getElementById('about')
+
+  if (!home || !work) {
+    return {
+      activeSection: 'home',
+      homeProgress: 0,
+      workProgress: 0,
+      aboutProgress: 0,
+      navDocked,
+    }
+  }
+
+  const homeBounds = sectionBounds(home)
+  const workBounds = sectionBounds(work)
+  const aboutBounds = about ? sectionBounds(about) : null
+
+  const homeTop = homeBounds.top
+  const workTop = workBounds.top
+  const aboutTop = aboutBounds?.top
+  const aboutBottom = aboutBounds?.bottom ?? document.documentElement.scrollHeight
+
+  const activeSection = resolveActiveSection(probe, workTop, aboutTop)
+  const workEnd = aboutTop ?? aboutBottom
+
+  return {
+    activeSection,
+    homeProgress:
+      activeSection === 'home' ? progressFromProbe(probe, homeTop, workTop) : 0,
+    workProgress:
+      activeSection === 'work' ? progressFromProbe(probe, workTop, workEnd) : 0,
+    aboutProgress:
+      activeSection === 'about' && aboutTop != null
+        ? progressFromProbe(probe, aboutTop, aboutBottom)
+        : 0,
+    navDocked,
+  }
 }
 
 function HamburgerIcon() {
   return (
-    <svg width={24} height={24} viewBox="0 0 24 24" className="text-[#000000]" aria-hidden>
+    <svg width={20} height={20} viewBox="0 0 24 24" className="text-black" aria-hidden>
       <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -37,22 +117,97 @@ function HamburgerIcon() {
   )
 }
 
-function NavActiveMark() {
+function ResumeIcon() {
   return (
-    <span
-      className="inline-block shrink-0 bg-black"
-      style={{ width: HOME_GUIDE_MARKER_PX, height: HOME_GUIDE_MARKER_PX }}
-      aria-hidden
-    />
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 2v6h6M16 13H8M16 17H8M10 9H8"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }
 
-function NavItemLabel({ active, children }: { active: boolean; children: ReactNode }) {
+function LinkedInIcon() {
   return (
-    <span className="inline-flex items-center gap-2">
-      {active ? <NavActiveMark /> : null}
-      {children}
-    </span>
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.75"
+      />
+      <path
+        d="M8 11v5M8 8h.01"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 11v5M12 11a2.5 2.5 0 0 1 5 0v5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+type NavTrackProps = {
+  label: string
+  active: boolean
+  progress: number
+  onClick: (event: MouseEvent<HTMLElement>) => void
+}
+
+function NavTrack({ label, active, progress, onClick }: NavTrackProps) {
+  const fillPct = `${progress * 100}%`
+  const markerAtStart = active && progress <= 0
+
+  return (
+    <div className="hidden w-[102px] shrink-0 flex-col gap-[3px] lg:flex">
+      <button
+        type="button"
+        onClick={onClick}
+        className={`text-left font-dmSans text-[13px] font-medium leading-[19.5px] transition-colors motion-reduce:transition-none ${
+          active ? 'text-black' : 'text-[#919191]'
+        }`}
+      >
+        {label}
+      </button>
+      <div className="relative h-px w-full" style={{ backgroundColor: NAV_TRACK }}>
+        {active ? (
+          <div
+            className="absolute left-0 top-0 h-px bg-black will-change-[width]"
+            style={{ width: fillPct }}
+          />
+        ) : null}
+        <span
+          className="absolute top-1/2 will-change-[left]"
+          style={{
+            width: HOME_GUIDE_MARKER_PX,
+            height: HOME_GUIDE_MARKER_PX,
+            backgroundColor: active ? '#000000' : NAV_INACTIVE,
+            left: markerAtStart ? 0 : fillPct,
+            transform: markerAtStart ? 'translate(-3px, -50%)' : 'translate(-50%, -50%)',
+          }}
+          aria-hidden
+        />
+      </div>
+    </div>
   )
 }
 
@@ -63,55 +218,72 @@ type SiteNavProps = {
 export function SiteNav({ variant }: SiteNavProps) {
   const pathname = usePathname()
   const isCaseStudy = variant === 'case-study'
+  const isLandingHome = !isCaseStudy && pathname === '/'
   const onCaseStudyRoute = pathname === '/latch' || pathname === '/hdfc'
-  const atWorkAnchor =
-    pathname === '/' &&
-    typeof window !== 'undefined' &&
-    (window.location.hash === '#work' || window.location.hash.startsWith('#work'))
 
-  const [homeScrollNav, setHomeScrollNav] = useState<'home' | 'work'>(() =>
-    typeof window !== 'undefined' && window.location.hash === '#work' ? 'work' : 'home',
-  )
+  const [navState, setNavState] = useState<SectionNavState>({
+    activeSection: 'home',
+    homeProgress: 0,
+    workProgress: 0,
+    aboutProgress: 0,
+    navDocked: isCaseStudy,
+  })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navShellRef = useRef<HTMLDivElement>(null)
 
-  const homeActive = isCaseStudy
-    ? pathname === '/' && !atWorkAnchor && !onCaseStudyRoute
-    : homeScrollNav === 'home'
-  const workActive = isCaseStudy
-    ? onCaseStudyRoute || atWorkAnchor
-    : homeScrollNav === 'work'
+  const homeActive = isCaseStudy ? false : navState.activeSection === 'home'
+  const workActive = isCaseStudy ? onCaseStudyRoute : navState.activeSection === 'work'
+  const aboutActive = !isCaseStudy && navState.activeSection === 'about'
 
   useEffect(() => {
-    if (isCaseStudy) return
-    if (window.location.hash !== '#work') return
-    setHomeScrollNav('work')
-    requestAnimationFrame(() => scrollToSectionId('work'))
-  }, [isCaseStudy])
+    if (!isLandingHome) return
+    const hash = window.location.hash.replace('#', '')
+    if (hash === 'work' || hash === 'about' || hash === 'home') {
+      requestAnimationFrame(() => scrollToSectionId(hash as 'home' | 'work' | 'about'))
+    }
+  }, [isLandingHome])
 
   useEffect(() => {
-    if (isCaseStudy) return
-
-    const work = document.getElementById('work')
-    if (!work) return
-
     let raf = 0
+    let ticking = false
+
     const update = () => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        setHomeScrollNav(computeWorkSectionActive(work) ? 'work' : 'home')
-      })
+      ticking = false
+      if (isCaseStudy) {
+        setNavState((prev) => ({ ...prev, navDocked: true, activeSection: 'work' }))
+        return
+      }
+      setNavState(computeSectionNavState(isLandingHome))
     }
 
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
+    const scheduleUpdate = () => {
+      if (ticking) return
+      ticking = true
+      raf = requestAnimationFrame(update)
+    }
+
+    scheduleUpdate()
+    window.addEventListener('scroll', scheduleUpdate, { passive: true })
+    window.addEventListener('resize', scheduleUpdate)
+
+    const home = document.getElementById('home')
+    const work = document.getElementById('work')
+    const about = document.getElementById('about')
+    const ro =
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(scheduleUpdate) : null
+    if (ro) {
+      if (home) ro.observe(home)
+      if (work) ro.observe(work)
+      if (about) ro.observe(about)
+    }
+
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', scheduleUpdate)
+      window.removeEventListener('resize', scheduleUpdate)
+      ro?.disconnect()
     }
-  }, [isCaseStudy])
+  }, [isCaseStudy, isLandingHome])
 
   useEffect(() => {
     if (!mobileMenuOpen) return
@@ -145,223 +317,210 @@ export function SiteNav({ variant }: SiteNavProps) {
     setMobileMenuOpen(false)
   }
 
-  function onHomeAnchor(event: MouseEvent<HTMLAnchorElement>) {
+  function onHomeJump(event: MouseEvent<HTMLElement>) {
     event.preventDefault()
     closeMobileMenu()
+    if (isCaseStudy) {
+      window.location.href = '/#home'
+      return
+    }
     scrollToSectionId('home')
   }
 
-  function onWorkAnchor(event: MouseEvent<HTMLAnchorElement>) {
+  function onWorkJump(event: MouseEvent<HTMLElement>) {
     event.preventDefault()
     closeMobileMenu()
+    if (isCaseStudy) {
+      window.location.href = '/#work'
+      return
+    }
     scrollToSectionId('work')
+  }
+
+  function onAboutJump(event: MouseEvent<HTMLElement>) {
+    event.preventDefault()
+    closeMobileMenu()
+    if (isCaseStudy) {
+      window.location.href = '/#about'
+      return
+    }
+    scrollToSectionId('about')
   }
 
   const nameLink = isCaseStudy ? (
     <Link
       href="/"
-      className="shrink-0 text-[#000000] transition-colors duration-300 ease-out hover:text-foreground motion-reduce:transition-none"
+      className="block min-w-0 truncate font-display text-[18px] font-normal leading-[20.16px] tracking-[-0.02em] text-black transition-colors hover:text-foreground motion-reduce:transition-none"
       style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
       onClick={closeMobileMenu}
     >
-      <span className="font-display text-[17px] font-normal leading-[1.12] tracking-[-0.02em] sm:text-[18px] md:text-[20px]">
-        Reshma Lokanathan
-      </span>
+      Reshma Lokanathan
     </Link>
   ) : (
     <a
       href="#home"
-      className="shrink-0 text-[#000000] transition-colors duration-300 ease-out hover:text-foreground motion-reduce:transition-none"
+      className="block min-w-0 truncate font-display text-[18px] font-normal leading-[20.16px] tracking-[-0.02em] text-black transition-colors hover:text-foreground motion-reduce:transition-none"
       style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
-      onClick={onHomeAnchor}
+      onClick={onHomeJump}
     >
-      <span className="font-display text-[17px] font-normal leading-[1.12] tracking-[-0.02em] sm:text-[18px] md:text-[20px]">
-        Reshma Lokanathan
-      </span>
+      Reshma Lokanathan
     </a>
   )
 
-  const homeLink = isCaseStudy ? (
-    <Link
-      href="/"
-      aria-current={homeActive ? 'page' : undefined}
-      className={homeActive ? navLinkActiveClass : navLinkClass}
-      onClick={closeMobileMenu}
-    >
-      <NavItemLabel active={homeActive}>Home</NavItemLabel>
-    </Link>
-  ) : (
-    <a
-      href="#home"
-      aria-current={homeActive ? 'page' : undefined}
-      className={homeActive ? navLinkActiveClass : navLinkClass}
-      onClick={onHomeAnchor}
-    >
-      <NavItemLabel active={homeActive}>Home</NavItemLabel>
-    </a>
-  )
-
-  const workLink = isCaseStudy ? (
-    <Link
-      href="/#work"
-      aria-current={workActive ? 'page' : undefined}
-      className={workActive ? navLinkActiveClass : navLinkClass}
-      onClick={closeMobileMenu}
-    >
-      <NavItemLabel active={workActive}>Work</NavItemLabel>
-    </Link>
-  ) : (
-    <a
-      href="#work"
-      aria-current={workActive ? 'page' : undefined}
-      className={workActive ? navLinkActiveClass : navLinkClass}
-      onClick={onWorkAnchor}
-    >
-      <NavItemLabel active={workActive}>Work</NavItemLabel>
-    </a>
-  )
-
-  const mobileHomeLink = isCaseStudy ? (
-    <Link
-      href="/"
-      className={`inline-flex py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
-      onClick={closeMobileMenu}
-    >
-      <NavItemLabel active={homeActive}>Home</NavItemLabel>
-    </Link>
-  ) : (
-    <a
-      href="#home"
-      className={`inline-flex py-3 font-sans ${homeActive ? navLinkActiveClass : navLinkClass}`}
-      onClick={onHomeAnchor}
-    >
-      <NavItemLabel active={homeActive}>Home</NavItemLabel>
-    </a>
-  )
-
-  const mobileWorkLink = isCaseStudy ? (
-    <Link
-      href="/#work"
-      className={`inline-flex py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
-      onClick={closeMobileMenu}
-    >
-      <NavItemLabel active={workActive}>Work</NavItemLabel>
-    </Link>
-  ) : (
-    <a
-      href="#work"
-      className={`inline-flex py-3 font-sans ${workActive ? navLinkActiveClass : navLinkClass}`}
-      onClick={onWorkAnchor}
-    >
-      <NavItemLabel active={workActive}>Work</NavItemLabel>
-    </a>
-  )
-
-  const navRow = (
-    <>
-      <nav
-        className="flex w-full flex-wrap items-center justify-between gap-4 py-4 md:gap-6"
-        aria-label="Primary"
+  const dockActions = (
+    <div className="flex shrink-0 items-center gap-2">
+      <a
+        href={RESUME_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={navIconButtonClass}
+        aria-label="Resume"
+        onClick={closeMobileMenu}
       >
-        {nameLink}
-
-        <div className="hidden max-w-full flex-1 flex-wrap items-center justify-end gap-x-8 gap-y-2 md:flex md:flex-initial md:justify-end">
-          {homeLink}
-          {workLink}
-          <a
-            href="https://www.linkedin.com/in/reshma-lokanathan19/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={navLinkClass}
-          >
-            LinkedIn
-          </a>
-          <a
-            href="https://reshma-lok.framer.website/ai-playground"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={navLinkClass}
-          >
-            AI Playground
-          </a>
-        </div>
-
-        <button
-          type="button"
-          className="flex p-1 md:hidden"
-          aria-expanded={mobileMenuOpen}
-          aria-controls="primary-mobile-nav"
-          onClick={() => setMobileMenuOpen((o) => !o)}
-        >
-          <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
-          <HamburgerIcon />
-        </button>
-      </nav>
-
-      <div
-        id="primary-mobile-nav"
-        aria-hidden={!mobileMenuOpen}
-        className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${
-          mobileMenuOpen ? 'max-h-[min(80vh,560px)]' : 'pointer-events-none max-h-0'
-        }`}
+        <ResumeIcon />
+      </a>
+      <a
+        href={LINKEDIN_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={navIconButtonClass}
+        aria-label="LinkedIn"
+        onClick={closeMobileMenu}
       >
-        <div className="border-t border-black/10 pb-4 pt-2">
-          {mobileHomeLink}
-          {mobileWorkLink}
-          <a
-            href={RESUME_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`block py-3 font-sans ${navLinkClass}`}
-            onClick={closeMobileMenu}
-          >
-            Resume
-          </a>
-          <a
-            href="https://www.linkedin.com/in/reshma-lokanathan19/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`block py-3 font-sans ${navLinkClass}`}
-            onClick={closeMobileMenu}
-          >
-            LinkedIn
-          </a>
-          <a
-            href="https://reshma-lok.framer.website/ai-playground"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`block py-3 font-sans ${navLinkClass}`}
-            onClick={closeMobileMenu}
-          >
-            AI Playground
-          </a>
-        </div>
-      </div>
-    </>
+        <LinkedInIcon />
+      </a>
+      <a
+        href={LETS_TALK_HREF}
+        className="inline-flex shrink-0 items-center gap-2 rounded-none bg-black px-[14px] py-[6px] font-dmSans text-[13px] font-medium text-white transition-[border-radius,opacity] duration-300 ease-out hover:rounded-xl hover:opacity-90 motion-reduce:transition-none"
+        onClick={closeMobileMenu}
+      >
+        Let&apos;s talk
+        <span aria-hidden>→</span>
+      </a>
+      <button
+        type="button"
+        className="inline-flex p-1 lg:hidden"
+        aria-expanded={mobileMenuOpen}
+        aria-controls="primary-mobile-nav"
+        onClick={() => setMobileMenuOpen((o) => !o)}
+      >
+        <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
+        <HamburgerIcon />
+      </button>
+    </div>
   )
+
+  const navDocked = navState.navDocked
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[80]">
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-[80] h-[68px]">
       <div
         ref={navShellRef}
-        className={`pointer-events-auto ${navBarSurfaceClass}`}
+        className="pointer-events-auto relative flex h-full items-center"
+        style={{
+          paddingLeft: guideSideInsetPlus(40),
+          paddingRight: guideSideInsetPlus(40),
+        }}
       >
         <div
-          style={{
-            // Match home: 40px breathing room inside the guide verticals
-            paddingLeft: guideSideInsetPlus(40),
-            paddingRight: guideSideInsetPlus(40),
-          }}
+          className={`relative flex w-full min-w-0 items-center px-4 py-2.5 transition-[background-color,border-color,box-shadow] duration-200 motion-reduce:transition-none ${
+            navDocked
+              ? 'border border-solid border-[#e0e0e0] bg-[#fdfcfa] shadow-[0_1px_0_rgba(0,0,0,0.04)]'
+              : 'border border-solid border-transparent bg-transparent shadow-none'
+          }`}
         >
-          {navRow}
+          <div className="relative z-[1] flex min-w-0 flex-1 items-center justify-start">
+            {nameLink}
+          </div>
+
+          <div className="relative z-[1] flex shrink-0 items-center gap-4">
+            <div className="hidden items-center gap-4 lg:flex">
+              <NavTrack
+                label="Home"
+                active={homeActive}
+                progress={navState.homeProgress}
+                onClick={onHomeJump}
+              />
+              <NavTrack
+                label="Work"
+                active={workActive}
+                progress={isCaseStudy ? 0 : navState.workProgress}
+                onClick={onWorkJump}
+              />
+              <NavTrack
+                label="About"
+                active={aboutActive}
+                progress={navState.aboutProgress}
+                onClick={onAboutJump}
+              />
+            </div>
+            {dockActions}
+          </div>
         </div>
-        <div className="h-px w-full bg-[#e0e0e0]" aria-hidden />
+
+        <div
+          id="primary-mobile-nav"
+          aria-hidden={!mobileMenuOpen}
+          className={`absolute inset-x-0 top-[68px] overflow-hidden border border-solid border-[#e0e0e0] bg-[#f7f6f2] shadow-sm transition-[max-height] duration-300 ease-out motion-reduce:transition-none lg:hidden ${
+            mobileMenuOpen ? 'max-h-[min(80vh,420px)]' : 'pointer-events-none max-h-0'
+          }`}
+        >
+          <div className="space-y-1 px-4 py-3">
+            <button
+              type="button"
+              className={`block w-full py-2 text-left font-dmSans text-[13px] font-medium ${
+                homeActive ? 'text-black' : 'text-[#919191]'
+              }`}
+              onClick={onHomeJump}
+            >
+              Home
+            </button>
+            <button
+              type="button"
+              className={`block w-full py-2 text-left font-dmSans text-[13px] font-medium ${
+                workActive ? 'text-black' : 'text-[#919191]'
+              }`}
+              onClick={onWorkJump}
+            >
+              Work
+            </button>
+            <button
+              type="button"
+              className={`block w-full py-2 text-left font-dmSans text-[13px] font-medium ${
+                aboutActive ? 'text-black' : 'text-[#919191]'
+              }`}
+              onClick={onAboutJump}
+            >
+              About
+            </button>
+            <a
+              href={RESUME_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 py-2 font-dmSans text-[13px] font-medium text-[#919191]"
+              onClick={closeMobileMenu}
+            >
+              <ResumeIcon />
+              Resume
+            </a>
+            <a
+              href={LINKEDIN_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 py-2 font-dmSans text-[13px] font-medium text-[#919191]"
+              onClick={closeMobileMenu}
+            >
+              <LinkedInIcon />
+              LinkedIn
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
-/** Spacer matching fixed nav height (content row + full-width rule). */
+/** Spacer matching fixed nav height (68px). */
 export function SiteNavSpacer() {
-  return <div aria-hidden className="relative z-10 min-h-[57px] shrink-0" />
+  return <div aria-hidden className="relative z-10 h-[68px] min-h-[68px] shrink-0" />
 }

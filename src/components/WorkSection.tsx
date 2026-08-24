@@ -247,131 +247,135 @@ function ProjectCard({
   }, [mediaVideoSrc, mediaVideoFullDuration])
 
   return (
-    <article className="relative flex w-full flex-col border border-solid border-[#e0e0e0] bg-white md:flex-row md:items-stretch">
+    <article className="group relative overflow-visible">
       <CardCornerMarks />
 
-      {/* Left column — text */}
-      <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-0">
-        <div className="-mx-[40px] border-b border-solid border-[#e0e0e0] px-[40px] py-[24px]">
-          <div className="flex items-center gap-3 md:gap-4">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-solid border-[#e0e0e0] bg-white">
+      <div className="relative flex w-full flex-col overflow-hidden rounded-none border border-solid border-[#e0e0e0] bg-white transition-[border-radius] duration-300 ease-out group-hover:rounded-[32px] motion-reduce:transition-none md:flex-row md:items-stretch">
+        {/* Left column — text */}
+        <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-0">
+          <div className="origin-left transition-transform duration-300 ease-out will-change-transform group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+            <div className="-mx-[40px] border-b border-solid border-[#e0e0e0] px-[40px] py-[24px]">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-solid border-[#e0e0e0] bg-white">
+                  <img
+                    src={logoSrc}
+                    alt={`${companyName} logo`}
+                    width={40}
+                    height={40}
+                    className="m-0 block h-full w-full object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <p className="min-w-0 flex-1 font-dmSans text-[18px] font-medium leading-snug text-[#000000]">
+                  {companyName}
+                </p>
+              </div>
+            </div>
+
+            <div className="-mx-[40px] flex flex-1 flex-col justify-center px-[40px] py-[80px]">
+              <div className="flex flex-wrap items-center justify-start gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex rounded-[999px] bg-[rgba(107,53,184,0.12)] px-[11px] py-1.5 font-dmSans text-[13px] font-medium leading-none text-[#6B35B8]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <h3 className="mt-[10px] font-dmSans text-[28px] font-medium leading-snug text-[#000000]">
+                {projectTitle}
+              </h3>
+
+              <p className="mt-[10px] font-dmSans text-[14px] font-normal leading-[1.6] text-[#6F6F6F]">
+                {description}
+              </p>
+
+              {bullets.length > 0 ? (
+                <ul className="mt-[68px] list-none space-y-0 font-dmSans text-[14px] font-normal leading-[2] text-[#333333]">
+                  {bullets.map((line) => (
+                    <li key={line}>° {line}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* Right column — cross pattern + optional centered video + non-overlapping corner markers */}
+        <div className="relative max-md:aspect-[16/10] w-full shrink-0 overflow-hidden border-t border-solid border-[#e0e0e0] md:aspect-auto md:w-[55%] md:overflow-hidden md:border-t-0 md:min-h-0 md:self-stretch md:rounded-none md:transition-[border-radius] md:duration-300 md:ease-out md:group-hover:rounded-r-[32px]">
+          <div
+            className="absolute inset-0 bg-[url('/crosspattern.png')] bg-repeat opacity-40"
+            aria-hidden
+          />
+          {mediaVideoSrc ? (
+            <div className="absolute inset-0 z-[1] bg-[#F6F5F3]">
+              {comingSoon ? <ComingSoonMediaTag /> : null}
+              <div
+                className="absolute overflow-hidden"
+                style={
+                  mediaVideoPaddingPx
+                    ? { inset: `${mediaVideoPaddingPx}px` }
+                    : { inset: 0 }
+                }
+              >
+                <video
+                  ref={videoRef}
+                  src={mediaVideoSrc}
+                  preload="metadata"
+                  className="block h-full w-full object-cover object-center [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
+                  muted
+                  loop
+                  playsInline
+                  aria-hidden
+                  onLoadedMetadata={
+                    mediaVideoFullDuration
+                      ? undefined
+                      : (e) => {
+                          e.currentTarget.currentTime = VIDEO_TRIM_START_SEC
+                        }
+                  }
+                  onTimeUpdate={
+                    mediaVideoFullDuration
+                      ? undefined
+                      : (e) => {
+                          const v = e.currentTarget
+                          if (v.currentTime >= VIDEO_TRIM_END_SEC) {
+                            v.currentTime = VIDEO_TRIM_START_SEC
+                          }
+                        }
+                  }
+                />
+              </div>
+            </div>
+          ) : mediaLayered ? (
+            <div className="absolute inset-0 z-[1] flex min-h-0 items-center justify-center overflow-hidden bg-[#F6F5F3] p-6 md:p-8">
+              {comingSoon ? <ComingSoonMediaTag /> : null}
+              <div className="relative flex h-full max-h-full w-full min-w-0 items-center justify-center">
+                <ProjectCardLayeredMedia
+                  baseSrc={mediaLayered.baseSrc}
+                  topRightSrc={mediaLayered.topRightSrc}
+                  bottomRightSrc={mediaLayered.bottomRightSrc}
+                  baseAlt={mediaLayered.baseAlt}
+                />
+              </div>
+            </div>
+          ) : mediaImageSrc ? (
+            <div className="absolute inset-0 z-[1] flex items-center justify-center bg-[#F6F5F3] p-6 md:p-8">
+              {comingSoon ? <ComingSoonMediaTag /> : null}
               <img
-                src={logoSrc}
-                alt={`${companyName} logo`}
-                width={40}
-                height={40}
-                className="m-0 block h-full w-full object-cover object-center"
+                src={mediaImageSrc}
+                alt="Impact Dashboard showing automation metrics, time saved, and workflow performance"
+                className="h-auto max-h-full w-[85%] object-contain [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
                 loading="lazy"
                 decoding="async"
               />
             </div>
-            <p className="min-w-0 flex-1 font-dmSans text-[18px] font-medium leading-snug text-[#000000]">
-              {companyName}
-            </p>
-          </div>
-        </div>
-
-        <div className="-mx-[40px] flex flex-1 flex-col justify-center px-[40px] py-[80px]">
-          <div className="flex flex-wrap items-center justify-start gap-2">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex rounded-[999px] bg-[rgba(107,53,184,0.12)] px-[11px] py-1.5 font-dmSans text-[13px] font-medium leading-none text-[#6B35B8]"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <h3 className="mt-[10px] font-dmSans text-[28px] font-medium leading-snug text-[#000000]">
-            {projectTitle}
-          </h3>
-
-          <p className="mt-[10px] font-dmSans text-[14px] font-normal leading-[1.6] text-[#6F6F6F]">
-            {description}
-          </p>
-
-          {bullets.length > 0 ? (
-            <ul className="mt-[68px] list-none space-y-0 font-dmSans text-[14px] font-normal leading-[2] text-[#333333]">
-              {bullets.map((line) => (
-                <li key={line}>° {line}</li>
-              ))}
-            </ul>
           ) : null}
+          <MediaCornerBrackets />
         </div>
-      </div>
-
-      {/* Right column — cross pattern + optional centered video + non-overlapping corner markers */}
-      <div className="relative max-md:aspect-[16/10] w-full shrink-0 overflow-visible border-t border-solid border-[#e0e0e0] md:aspect-auto md:w-[55%] md:border-t-0 md:min-h-0 md:self-stretch">
-        <div
-          className="absolute inset-0 bg-[url('/crosspattern.png')] bg-repeat opacity-40"
-          aria-hidden
-        />
-        {mediaVideoSrc ? (
-          <div className="absolute inset-0 z-[1] bg-[#F6F5F3]">
-            {comingSoon ? <ComingSoonMediaTag /> : null}
-            <div
-              className="absolute overflow-hidden"
-              style={
-                mediaVideoPaddingPx
-                  ? { inset: `${mediaVideoPaddingPx}px` }
-                  : { inset: 0 }
-              }
-            >
-              <video
-                ref={videoRef}
-                src={mediaVideoSrc}
-                preload="metadata"
-                className="block h-full w-full object-cover object-center [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
-                muted
-                loop
-                playsInline
-                aria-hidden
-                onLoadedMetadata={
-                  mediaVideoFullDuration
-                    ? undefined
-                    : (e) => {
-                        e.currentTarget.currentTime = VIDEO_TRIM_START_SEC
-                      }
-                }
-                onTimeUpdate={
-                  mediaVideoFullDuration
-                    ? undefined
-                    : (e) => {
-                        const v = e.currentTarget
-                        if (v.currentTime >= VIDEO_TRIM_END_SEC) {
-                          v.currentTime = VIDEO_TRIM_START_SEC
-                        }
-                      }
-                }
-              />
-            </div>
-          </div>
-        ) : mediaLayered ? (
-          <div className="absolute inset-0 z-[1] flex min-h-0 items-center justify-center overflow-hidden bg-[#F6F5F3] p-6 md:p-8">
-            {comingSoon ? <ComingSoonMediaTag /> : null}
-            <div className="relative flex h-full max-h-full w-full min-w-0 items-center justify-center">
-              <ProjectCardLayeredMedia
-                baseSrc={mediaLayered.baseSrc}
-                topRightSrc={mediaLayered.topRightSrc}
-                bottomRightSrc={mediaLayered.bottomRightSrc}
-                baseAlt={mediaLayered.baseAlt}
-              />
-            </div>
-          </div>
-        ) : mediaImageSrc ? (
-          <div className="absolute inset-0 z-[1] flex items-center justify-center bg-[#F6F5F3] p-6 md:p-8">
-            {comingSoon ? <ComingSoonMediaTag /> : null}
-            <img
-              src={mediaImageSrc}
-              alt="Impact Dashboard showing automation metrics, time saved, and workflow performance"
-              className="h-auto max-h-full w-[85%] object-contain [box-shadow:0_8px_32px_rgba(0,0,0,0.12)]"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        ) : null}
-        <MediaCornerBrackets />
       </div>
     </article>
   )
@@ -379,10 +383,22 @@ function ProjectCard({
 
 export function WorkSection() {
   return (
-    <section id="work" className="w-full pt-[100px] font-dmSans">
+    <section id="work" className="relative w-full pt-[100px] font-dmSans">
+      {/* Continuous outer verticals from hero through work */}
+      <div className="pointer-events-none absolute inset-0 z-[10] hidden lg:block" aria-hidden>
+        <span
+          className="absolute inset-y-0 w-px"
+          style={{ left: HOME_GUIDE_SIDE_INSET_VAR, backgroundColor: HOME_GUIDE_LINE }}
+        />
+        <span
+          className="absolute inset-y-0 w-px"
+          style={{ right: HOME_GUIDE_SIDE_INSET_VAR, backgroundColor: HOME_GUIDE_LINE }}
+        />
+      </div>
+
       {/* Title aligns to the same guide inset as the case study cards */}
       <div
-        className={`mb-[70px] flex items-baseline justify-between gap-6 ${HOME_GUIDE_SIDE_PADDING_CLASS}`}
+        className={`relative z-[20] mb-[70px] flex items-baseline justify-between gap-6 ${HOME_GUIDE_SIDE_PADDING_CLASS}`}
       >
         <h2 className="flex items-center gap-3 font-display text-left text-[40px] font-medium text-[#000000]">
           <span
@@ -398,18 +414,6 @@ export function WorkSection() {
       </div>
 
       <div className="relative w-full pb-[80px]">
-        {/* Continuous outer verticals connecting all three cards */}
-        <div className="pointer-events-none absolute inset-0 z-[10] hidden lg:block" aria-hidden>
-          <span
-            className="absolute inset-y-0 w-px"
-            style={{ left: HOME_GUIDE_SIDE_INSET_VAR, backgroundColor: HOME_GUIDE_LINE }}
-          />
-          <span
-            className="absolute inset-y-0 w-px"
-            style={{ right: HOME_GUIDE_SIDE_INSET_VAR, backgroundColor: HOME_GUIDE_LINE }}
-          />
-        </div>
-
         <div className={`relative z-[20] flex w-full flex-col gap-[142px] ${HOME_GUIDE_SIDE_FLUSH_CLASS}`}>
             <WorkCardGuideFrame>
               <Link

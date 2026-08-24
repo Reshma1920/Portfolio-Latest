@@ -5,13 +5,11 @@ import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 import {
   GUIDE_DOT_BACKGROUND_IMAGE,
   GUIDE_DOT_BACKGROUND_SIZE,
-  guideContentWidthBetweenRails,
   guideSideInsetPlus,
   HOME_GUIDE_LINE,
   HOME_GUIDE_MARKER_PX,
   HOME_GUIDE_SIDE_INSET_VAR,
 } from './caseStudyLayout'
-import { useGuideFrameMetrics } from './useGuideFrameMetrics'
 
 type CaseStudySectionFrameProps = {
   children: ReactNode
@@ -271,11 +269,10 @@ export function CaseStudySectionGap() {
       aria-hidden
     >
       <div
-        className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+        className="pointer-events-none absolute -left-5 -right-5 sm:-left-8 sm:-right-8 md:-left-10 md:-right-10"
         style={{
           top: bandTop,
           height: CASE_STUDY_SECTION_DOT_BAND_PX,
-          width: guideContentWidthBetweenRails,
           ...DOT_FILL_STYLE,
         }}
       />
@@ -356,25 +353,28 @@ export function CaseStudySectionFrame({
   tone = 'light',
   showMarkers = true,
 }: CaseStudySectionFrameProps) {
-  const frameRef = useRef<HTMLDivElement>(null)
-  const { width, top, height, inset } = useGuideFrameMetrics(frameRef)
   const line = tone === 'dark' ? 'rgba(255,255,255,0.28)' : HOME_GUIDE_LINE
   const mark = tone === 'dark' ? '#ffffff' : '#000000'
+  const half = HOME_GUIDE_MARKER_PX / 2
 
   const markerBase: CSSProperties = {
     width: HOME_GUIDE_MARKER_PX,
     height: HOME_GUIDE_MARKER_PX,
     backgroundColor: mark,
+    marginLeft: -half,
+    marginTop: -half,
   }
 
   return (
-    <div ref={frameRef} className={`relative ${className}`}>
-      {inset > 0 && width > 0 && height > 0 ? (
-        <div
-          className="pointer-events-none fixed z-[70] hidden lg:block"
-          style={{ top, height, left: 0, width }}
-          aria-hidden
-        >
+    <div className={`relative ${className}`}>
+      <div
+        className="pointer-events-none absolute inset-y-0 z-[70] hidden lg:block"
+        style={{
+          left: `calc(-1 * (${HOME_GUIDE_SIDE_INSET_VAR} + 40px))`,
+          right: `calc(-1 * (${HOME_GUIDE_SIDE_INSET_VAR} + 40px))`,
+        }}
+        aria-hidden
+      >
         <span
           className="absolute inset-x-0 top-0 h-px"
           style={{ backgroundColor: line }}
@@ -383,28 +383,27 @@ export function CaseStudySectionFrame({
           className="absolute inset-x-0 bottom-0 h-px"
           style={{ backgroundColor: line }}
         />
-        {showMarkers && inset > 0 ? (
+        {showMarkers ? (
           <>
             <span
               className="absolute top-0"
-              style={{ ...markerBase, left: inset, transform: 'translate(-50%, -50%)' }}
+              style={{ ...markerBase, left: HOME_GUIDE_SIDE_INSET_VAR }}
             />
             <span
               className="absolute top-0"
-              style={{ ...markerBase, right: inset, transform: 'translate(50%, -50%)' }}
+              style={{ ...markerBase, left: `calc(100% - ${HOME_GUIDE_SIDE_INSET_VAR})` }}
             />
             <span
-              className="absolute bottom-0"
-              style={{ ...markerBase, left: inset, transform: 'translate(-50%, 50%)' }}
+              className="absolute top-full"
+              style={{ ...markerBase, left: HOME_GUIDE_SIDE_INSET_VAR }}
             />
             <span
-              className="absolute bottom-0"
-              style={{ ...markerBase, right: inset, transform: 'translate(50%, 50%)' }}
+              className="absolute top-full"
+              style={{ ...markerBase, left: `calc(100% - ${HOME_GUIDE_SIDE_INSET_VAR})` }}
             />
           </>
         ) : null}
-        </div>
-      ) : null}
+      </div>
       <div className="relative z-[1]">{children}</div>
     </div>
   )
