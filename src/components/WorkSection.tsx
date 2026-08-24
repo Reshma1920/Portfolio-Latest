@@ -253,7 +253,7 @@ function ProjectCard({
       <div className="relative flex w-full flex-col overflow-hidden rounded-none border border-solid border-[#e0e0e0] bg-white transition-[border-radius] duration-300 ease-out group-hover:rounded-[32px] motion-reduce:transition-none md:flex-row md:items-stretch">
         {/* Left column — text */}
         <div className="flex w-full shrink-0 flex-col px-[40px] pb-[63px] pt-0 md:w-[45%] md:border-r md:border-solid md:border-[#e0e0e0] md:pb-0">
-          <div className="origin-left transition-transform duration-300 ease-out will-change-transform group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+          <div className="origin-left transition-transform duration-300 ease-out will-change-transform group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100">
             <div className="-mx-[40px] border-b border-solid border-[#e0e0e0] px-[40px] py-[24px]">
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-solid border-[#e0e0e0] bg-white">
